@@ -7,23 +7,29 @@ export default defineSchema({
     name: v.optional(v.string()),
     image: v.optional(v.string()),
   }).index("by_tokenIdentifier", ["tokenIdentifier"]),
+
   lecturers: defineTable({
     name: v.string(),
+    userId: v.string(),
+  }),
+
+  lecturerDetails: defineTable({
+    lecturerId: v.id("lecturers"),
+    subjectId: v.id("subjects"),
     qualification: v.string(),
     experience: v.string(),
     publications: v.string(),
-    subjects: v.array(v.string()),
-    assignedSubjects: v.optional(v.array(v.string())),
-    averageWeight: v.optional(v.number()),
-    details: v.optional(v.object({})),
-    userId: v.string(),
+    feedback: v.number(),
+    professionalCertificate: v.boolean(),
   }),
+
   subjects: defineTable({
     name: v.string(),
     year: v.number(),
     semester: v.number(),
     department: v.string(),
   }),
+
   feedbacks: defineTable({
     lecturerId: v.id("lecturers"),
     subjectName: v.string(),
