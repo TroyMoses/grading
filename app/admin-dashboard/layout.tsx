@@ -40,6 +40,12 @@ export default function AdminDashboardLayout({
                 <a href="/admin-dashboard/lecturers">Manage Lecturers</a>
               </Button>
               <Button variant="ghost" className="w-full justify-start" asChild>
+                <a href="/admin-dashboard/lecturers/add">Add Lecturer</a>
+              </Button>
+              <Button variant="ghost" className="w-full justify-start" asChild>
+                <a href="/admin-dashboard/lecturers/view">View Lecturers</a>
+              </Button>
+              <Button variant="ghost" className="w-full justify-start" asChild>
                 <a href="/admin-dashboard/subjects/manage">Manage Subjects</a>
               </Button>
               <Button variant="ghost" className="w-full justify-start" asChild>
@@ -54,5 +60,5 @@ export default function AdminDashboardLayout({
         <Toaster />
       </main>
     </div>
-  );
+  )
 }

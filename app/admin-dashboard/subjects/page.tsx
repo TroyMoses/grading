@@ -14,8 +14,13 @@ import {
 
 function calculateWeight(
   criteria: string,
-  value: string | number | boolean
+  value: string | number | boolean | undefined
 ): number {
+  if (value === undefined) return 0;
+
+  // Normalize the value for consistent mapping
+  const normalizedValue = value.toString().trim();
+
   const weights = {
     feedback: 2,
     qualification: 3,
@@ -26,28 +31,28 @@ function calculateWeight(
 
   const scales: { [key: string]: { [key: string]: number } } = {
     feedback: {
-      "Above 80": 5,
-      "70-79": 4,
-      "60-69": 3,
-      "50-59": 2,
-      "Below 50": 1,
+      "2": 1,
     },
     qualification: {
-      Degree: 1,
+      "Degree": 1,
       "Degree-Master[not align]": 2,
       "Degree-Master[align]": 3,
       "Degree-Master-PhD[not align]": 4,
       "Degree-Master-PhD[align]": 5,
-      Professor: 6,
+      "Professor": 6,
     },
     publications: { None: 0, "1-2": 1, "3-4": 2, "5-6": 3, "7-8": 4, "9+": 5 },
     experience: { "0": 1, "1-3": 2, "4-6": 3, "7-9": 4, "10+": 5 },
     professionalCertificate: { true: 1, false: 0 },
   };
 
-  const weight = weights[criteria as keyof typeof weights];
-  const scale = scales[criteria][value.toString()];
+  // Debugging logs to check mappings
+  console.log(`Calculating weight for: ${criteria} with value: ${normalizedValue}`);
 
+  const weight = weights[criteria] || 0;
+  const scale = scales[criteria]?.[normalizedValue] || 0;
+
+  console.log(`Mapped weight: ${weight}, scale: ${scale}, product: ${weight * scale}`);
   return weight * scale;
 }
 

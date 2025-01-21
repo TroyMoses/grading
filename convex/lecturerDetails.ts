@@ -53,6 +53,7 @@ export const updateLecturerDetails = mutation({
   args: {
     lecturerId: v.id("lecturers"),
     subjectId: v.id("subjects"),
+    qualification: v.string(),
     experience: v.string(),
     publications: v.string(),
     feedback: v.number(),
@@ -76,7 +77,6 @@ export const updateLecturerDetails = mutation({
         lecturerId,
         subjectId,
         ...details,
-        qualification: "",
       });
     }
 
@@ -100,6 +100,7 @@ export const getGradingData = query({
           data[lecturer.name] = {};
         }
         data[lecturer.name][subject.name] = {
+          qualification: detail.qualification,
           experience: detail.experience,
           publications: detail.publications,
           feedback: detail.feedback,

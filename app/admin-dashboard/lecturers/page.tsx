@@ -19,25 +19,23 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function ManageLecturers() {
   const { toast } = useToast();
-  const [selectedLecturer, setSelectedLecturer] = useState("");
-  const [selectedSubject, setSelectedSubject] = useState("");
+  const [selectedLecturerId, setSelectedLecturerId] = useState("");
+  const [selectedSubjectId, setSelectedSubjectId] = useState("");
 
   const lecturers = useQuery(api.lecturers.getAllLecturers) || [];
   const subjects = useQuery(api.subjects.getAllSubjects) || [];
 
-  const updateLecturerDetails = useMutation(
-    api.lecturerDetails.updateLecturerDetails
-  );
+  const updateLecturerDetails = useMutation(api.lecturerDetails.updateLecturerDetails);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const details = {
-      lecturer: selectedLecturer,
-      subject: selectedSubject,
-      qualification: formData.get("qualification"),
-      experience: formData.get("experience"),
-      publications: formData.get("publications"),
+      lecturerId: selectedLecturerId,
+      subjectId: selectedSubjectId,
+      qualification: formData.get("qualification") as string,
+      experience: formData.get("experience") as string,
+      publications: formData.get("publications") as string,
       feedback: Number(formData.get("feedback")),
       professionalCertificate: formData.get("professionalCertificate") === "on",
     };
@@ -47,7 +45,7 @@ export default function ManageLecturers() {
         title: "Success",
         description: "Lecturer details updated successfully.",
       });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({
         title: "Error",
@@ -67,7 +65,7 @@ export default function ManageLecturers() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="lecturer">Select Lecturer</Label>
-              <Select onValueChange={setSelectedLecturer}>
+              <Select onValueChange={setSelectedLecturerId}>
                 <SelectTrigger id="lecturer">
                   <SelectValue placeholder="Select a lecturer" />
                 </SelectTrigger>
@@ -82,7 +80,7 @@ export default function ManageLecturers() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="subject">Select Subject</Label>
-              <Select onValueChange={setSelectedSubject}>
+              <Select onValueChange={setSelectedSubjectId}>
                 <SelectTrigger id="subject">
                   <SelectValue placeholder="Select a subject" />
                 </SelectTrigger>
@@ -96,7 +94,7 @@ export default function ManageLecturers() {
               </Select>
             </div>
           </div>
-          {selectedLecturer && selectedSubject && (
+          {selectedLecturerId && selectedSubjectId && (
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="qualification">Qualification</Label>
