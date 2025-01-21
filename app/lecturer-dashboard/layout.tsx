@@ -4,9 +4,8 @@ import { useUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Toaster } from "@/components/ui/toaster";
 
-export default function AdminDashboardLayout({
+export default function LecturerDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -20,10 +19,10 @@ export default function AdminDashboardLayout({
     redirect("/sign-in");
   }
 
-  const isAdmin = user?.publicMetadata?.role === "admin";
+  const isLecturer = user?.publicMetadata?.role === "lecturer";
 
-  if (!isAdmin) {
-    redirect("/lecturer-dashboard");
+  if (!isLecturer) {
+    redirect("/");
   }
 
   return (
@@ -31,19 +30,13 @@ export default function AdminDashboardLayout({
       <aside className="w-64 border-r">
         <ScrollArea className="h-full">
           <div className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Admin Dashboard</h2>
+            <h2 className="text-lg font-semibold mb-4">Lecturer Dashboard</h2>
             <nav className="space-y-2">
               <Button variant="ghost" className="w-full justify-start" asChild>
-                <a href="/admin-dashboard">Dashboard</a>
+                <a href="/lecturer-dashboard">Dashboard</a>
               </Button>
               <Button variant="ghost" className="w-full justify-start" asChild>
-                <a href="/admin-dashboard/lecturers">Manage Lecturers</a>
-              </Button>
-              <Button variant="ghost" className="w-full justify-start" asChild>
-                <a href="/admin-dashboard/subjects/manage">Manage Subjects</a>
-              </Button>
-              <Button variant="ghost" className="w-full justify-start" asChild>
-                <a href="/admin-dashboard/subjects">Grading Table</a>
+                <a href="/lecturer-dashboard/subjects">My Subjects</a>
               </Button>
             </nav>
           </div>
@@ -51,7 +44,6 @@ export default function AdminDashboardLayout({
       </aside>
       <main className="flex-1 p-6 overflow-auto">
         <ScrollArea className="h-full">{children}</ScrollArea>
-        <Toaster />
       </main>
     </div>
   );
