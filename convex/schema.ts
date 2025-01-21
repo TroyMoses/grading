@@ -19,7 +19,7 @@ export default defineSchema({
     qualification: v.string(),
     experience: v.string(),
     publications: v.string(),
-    feedback: v.number(),
+    feedback: v.string(),
     professionalCertificate: v.boolean(),
   }),
 
