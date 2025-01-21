@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
@@ -12,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -36,7 +36,7 @@ export default function ManageLecturers() {
       qualification: formData.get("qualification") as string,
       experience: formData.get("experience") as string,
       publications: formData.get("publications") as string,
-      feedback: Number(formData.get("feedback")),
+      feedback: formData.get("feedback") as string,
       professionalCertificate: formData.get("professionalCertificate") === "on",
     };
     try {
@@ -45,7 +45,6 @@ export default function ManageLecturers() {
         title: "Success",
         description: "Lecturer details updated successfully.",
       });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({
         title: "Error",
@@ -153,13 +152,18 @@ export default function ManageLecturers() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="feedback">Feedback</Label>
-                <Input
-                  type="number"
-                  id="feedback"
-                  name="feedback"
-                  min="0"
-                  max="100"
-                />
+                <Select name="feedback">
+                  <SelectTrigger id="feedback">
+                    <SelectValue placeholder="Select feedback" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Above 80">Above 80</SelectItem>
+                    <SelectItem value="70-79">70-79</SelectItem>
+                    <SelectItem value="60-69">60-69</SelectItem>
+                    <SelectItem value="50-59">50-59</SelectItem>
+                    <SelectItem value="Below 50">Below 50</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="col-span-2 flex items-center space-x-2">
                 <Checkbox

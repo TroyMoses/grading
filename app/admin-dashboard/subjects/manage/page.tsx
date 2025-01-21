@@ -57,6 +57,8 @@ export default function ManageSubjects() {
         department,
         subjects: subjects.filter((s) => s.trim() !== ""),
       });
+      setYear(1);
+      setSemester(1);
       setSubjects([""]);
       setDepartment("");
       toast({
@@ -85,7 +87,7 @@ export default function ManageSubjects() {
               <div className="space-y-2">
                 <Label htmlFor="year">Year</Label>
                 <Select
-                  value={semester.toString()}
+                  value={year.toString()}
                   onValueChange={(value) => setYear(Number(value))}
                 >
                   <SelectTrigger id="year">

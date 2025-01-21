@@ -31,7 +31,11 @@ function calculateWeight(
 
   const scales: { [key: string]: { [key: string]: number } } = {
     feedback: {
-      "2": 1,
+      "Above 80": 5,
+      "70-79": 4,
+      "60-69": 3,
+      "50-59": 2,
+      "Below 50": 1,
     },
     qualification: {
       "Degree": 1,

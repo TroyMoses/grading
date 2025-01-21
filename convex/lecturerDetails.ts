@@ -56,7 +56,7 @@ export const updateLecturerDetails = mutation({
     qualification: v.string(),
     experience: v.string(),
     publications: v.string(),
-    feedback: v.number(),
+    feedback: v.string(),
     professionalCertificate: v.boolean(),
   },
   handler: async (ctx, args) => {
