@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { Lecturer } from "../lib/types";
 
 // Fetch all lecturers
 export const getAllLecturers = query({
@@ -11,7 +12,7 @@ export const getAllLecturers = query({
 // Fetch a specific lecturer by userId
 export const getLecturer = query({
   args: { userId: v.string() },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<Lecturer | null> => {
     return await ctx.db
       .query("lecturers")
       .filter((q) => q.eq(q.field("userId"), args.userId))
