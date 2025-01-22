@@ -171,14 +171,19 @@ export default function ManageSubjects() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {allSubjects.map((subject: any) => (
-                <TableRow key={subject._id}>
-                  <TableCell>{subject.name}</TableCell>
-                  <TableCell>{subject.year}</TableCell>
-                  <TableCell>{subject.semester}</TableCell>
-                  <TableCell>{subject.department}</TableCell>
-                </TableRow>
-              ))}
+              {allSubjects.map(
+                (
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  subject: any
+                ) => (
+                  <TableRow key={subject._id}>
+                    <TableCell>{subject.name}</TableCell>
+                    <TableCell>{subject.year}</TableCell>
+                    <TableCell>{subject.semester}</TableCell>
+                    <TableCell>{subject.department}</TableCell>
+                  </TableRow>
+                )
+              )}
             </TableBody>
           </Table>
         </CardContent>

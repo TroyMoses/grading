@@ -15,12 +15,16 @@ import {
 
 export default function LecturerSubjects() {
   const { userId } = useAuth();
-  const lecturer = useQuery(api.lecturers.getLecturer, { userId: userId ?? "" }) || {};
+  const lecturer =
+    useQuery(api.lecturers.getLecturer, { userId: userId ?? "" }) || {};
   const subjects =
-    useQuery(api.lecturerDetails.getSubjectsByLecturerId, { lecturerId: lecturer._id }) || [];
+    useQuery(api.lecturerDetails.getSubjectsByLecturerId, {
+      lecturerId: lecturer._id,
+    }) || [];
   const lecturerDetails =
-    useQuery(api.lecturerDetails.getLecturerDetailsByLecturerId, { lecturerId: lecturer._id }) ||
-    [];
+    useQuery(api.lecturerDetails.getLecturerDetailsByLecturerId, {
+      lecturerId: lecturer._id,
+    }) || [];
 
   return (
     <Card>
