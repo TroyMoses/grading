@@ -15,7 +15,8 @@ import {
 export default function ViewLecturers() {
   const lecturers = useQuery(api.lecturers.getAllLecturers) || [];
   const subjects = useQuery(api.subjects.getAllSubjects) || [];
-  const lecturerDetails = useQuery(api.lecturerDetails.getLecturerDetails) || [];
+  const lecturerDetails =
+    useQuery(api.lecturerDetails.getLecturerDetails) || [];
 
   return (
     <Card>
@@ -36,27 +37,38 @@ export default function ViewLecturers() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {lecturerDetails.map((detail: any) => {
-              const lecturer = lecturers.find(
-                (l: any) => l._id === detail.lecturerId
-              );
-              const subject = subjects.find(
-                (s: any) => s._id === detail.subjectId
-              );
-              return (
-                <TableRow key={`${detail.lecturerId}-${detail.subjectId}`}>
-                  <TableCell>{lecturer?.name}</TableCell>
-                  <TableCell>{subject?.name}</TableCell>
-                  <TableCell>{detail.qualification}</TableCell>
-                  <TableCell>{detail.experience}</TableCell>
-                  <TableCell>{detail.publications}</TableCell>
-                  <TableCell>{detail.feedback}</TableCell>
-                  <TableCell>
-                    {detail.professionalCertificate ? "Yes" : "No"}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+            {lecturerDetails.map(
+              (
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                detail: any
+              ) => {
+                const lecturer = lecturers.find(
+                  (
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    l: any
+                  ) => l._id === detail.lecturerId
+                );
+                const subject = subjects.find(
+                  (
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    s: any
+                  ) => s._id === detail.subjectId
+                );
+                return (
+                  <TableRow key={`${detail.lecturerId}-${detail.subjectId}`}>
+                    <TableCell>{lecturer?.name}</TableCell>
+                    <TableCell>{subject?.name}</TableCell>
+                    <TableCell>{detail.qualification}</TableCell>
+                    <TableCell>{detail.experience}</TableCell>
+                    <TableCell>{detail.publications}</TableCell>
+                    <TableCell>{detail.feedback}</TableCell>
+                    <TableCell>
+                      {detail.professionalCertificate ? "Yes" : "No"}
+                    </TableCell>
+                  </TableRow>
+                );
+              }
+            )}
           </TableBody>
         </Table>
       </CardContent>
