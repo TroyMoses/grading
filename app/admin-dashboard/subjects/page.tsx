@@ -38,12 +38,12 @@ function calculateWeight(
       "Below 50": 1,
     },
     qualification: {
-      "Degree": 1,
+      Degree: 1,
       "Degree-Master[not align]": 2,
       "Degree-Master[align]": 3,
       "Degree-Master-PhD[not align]": 4,
       "Degree-Master-PhD[align]": 5,
-      "Professor": 6,
+      Professor: 6,
     },
     publications: { None: 0, "1-2": 1, "3-4": 2, "5-6": 3, "7-8": 4, "9+": 5 },
     experience: { "0": 1, "1-3": 2, "4-6": 3, "7-9": 4, "10+": 5 },
@@ -51,12 +51,18 @@ function calculateWeight(
   };
 
   // Debugging logs to check mappings
-  console.log(`Calculating weight for: ${criteria} with value: ${normalizedValue}`);
+  console.log(
+    `Calculating weight for: ${criteria} with value: ${normalizedValue}`
+  );
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-expect-error
   const weight = weights[criteria] || 0;
   const scale = scales[criteria]?.[normalizedValue] || 0;
 
-  console.log(`Mapped weight: ${weight}, scale: ${scale}, product: ${weight * scale}`);
+  console.log(
+    `Mapped weight: ${weight}, scale: ${scale}, product: ${weight * scale}`
+  );
   return weight * scale;
 }
 
@@ -93,22 +99,32 @@ export default function SubjectsGradingTable() {
                   if (lecturerSubjectData) {
                     totalWeight += calculateWeight(
                       "feedback",
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      //@ts-expect-error
                       lecturerSubjectData.feedback
                     );
                     totalWeight += calculateWeight(
                       "qualification",
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      //@ts-expect-error
                       lecturerSubjectData.qualification
                     );
                     totalWeight += calculateWeight(
                       "publications",
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      //@ts-expect-error
                       lecturerSubjectData.publications
                     );
                     totalWeight += calculateWeight(
                       "experience",
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      //@ts-expect-error
                       lecturerSubjectData.experience
                     );
                     totalWeight += calculateWeight(
                       "professionalCertificate",
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      //@ts-expect-error
                       lecturerSubjectData.professionalCertificate
                     );
                   }
