@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 function calculateWeight(
   criteria: string,
@@ -50,19 +51,11 @@ function calculateWeight(
     professionalCertificate: { true: 1, false: 0 },
   };
 
-  // Debugging logs to check mappings
-  console.log(
-    `Calculating weight for: ${criteria} with value: ${normalizedValue}`
-  );
-
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-expect-error
   const weight = weights[criteria] || 0;
   const scale = scales[criteria]?.[normalizedValue] || 0;
 
-  console.log(
-    `Mapped weight: ${weight}, scale: ${scale}, product: ${weight * scale}`
-  );
   return weight * scale;
 }
 
@@ -79,65 +72,70 @@ export default function SubjectsGradingTable() {
         <CardTitle>Subjects Grading Table</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Lecturers</TableHead>
-              {gradingData.subjects.map((subject: string) => (
-                <TableHead key={subject}>{subject}</TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {gradingData.lecturers.map((lecturer: string) => (
-              <TableRow key={lecturer}>
-                <TableCell>{lecturer}</TableCell>
-                {gradingData.subjects.map((subject: string) => {
-                  const lecturerSubjectData =
-                    gradingData.data[lecturer]?.[subject];
-                  let totalWeight = 0;
-                  if (lecturerSubjectData) {
-                    totalWeight += calculateWeight(
-                      "feedback",
-                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                      //@ts-expect-error
-                      lecturerSubjectData.feedback
-                    );
-                    totalWeight += calculateWeight(
-                      "qualification",
-                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                      //@ts-expect-error
-                      lecturerSubjectData.qualification
-                    );
-                    totalWeight += calculateWeight(
-                      "publications",
-                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                      //@ts-expect-error
-                      lecturerSubjectData.publications
-                    );
-                    totalWeight += calculateWeight(
-                      "experience",
-                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                      //@ts-expect-error
-                      lecturerSubjectData.experience
-                    );
-                    totalWeight += calculateWeight(
-                      "professionalCertificate",
-                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                      //@ts-expect-error
-                      lecturerSubjectData.professionalCertificate
-                    );
-                  }
-                  return (
-                    <TableCell key={`${lecturer}-${subject}`}>
-                      {totalWeight.toFixed(2)}
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <ScrollArea className="w-full overflow-auto">
+          <div className="min-w-max">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="sticky left-0 z-20 bg-background">Lecturers</TableHead>
+                  {gradingData.subjects.map((subject: string) => (
+                    <TableHead key={subject}>{subject}</TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {gradingData.lecturers.map((lecturer: string) => (
+                  <TableRow key={lecturer}>
+                    <TableCell className="sticky left-0 z-20 bg-background">{lecturer}</TableCell>
+                    {gradingData.subjects.map((subject: string) => {
+                      const lecturerSubjectData =
+                        gradingData.data[lecturer]?.[subject];
+                      let totalWeight = 0;
+                      if (lecturerSubjectData) {
+                        totalWeight += calculateWeight(
+                          "feedback",
+                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                          //@ts-expect-error
+                          lecturerSubjectData.feedback
+                        );
+                        totalWeight += calculateWeight(
+                          "qualification",
+                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                          //@ts-expect-error
+                          lecturerSubjectData.qualification
+                        );
+                        totalWeight += calculateWeight(
+                          "publications",
+                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                          //@ts-expect-error
+                          lecturerSubjectData.publications
+                        );
+                        totalWeight += calculateWeight(
+                          "experience",
+                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                          //@ts-expect-error
+                          lecturerSubjectData.experience
+                        );
+                        totalWeight += calculateWeight(
+                          "professionalCertificate",
+                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                          //@ts-expect-error
+                          lecturerSubjectData.professionalCertificate
+                        );
+                      }
+                      return (
+                        <TableCell key={`${lecturer}-${subject}`}>
+                          {totalWeight.toFixed(2)}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
       </CardContent>
     </Card>
   );
