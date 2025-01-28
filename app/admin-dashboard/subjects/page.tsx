@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+// import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 function calculateWeight(
   criteria: string,
@@ -72,12 +72,14 @@ export default function SubjectsGradingTable() {
         <CardTitle>Subjects Grading Table</CardTitle>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="w-full overflow-auto">
-          <div className="min-w-max">
-            <Table>
+        <div className="w-full overflow-auto">
+          <div style={{ minWidth: "1000px" }}>
+            <Table className="table-auto">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="sticky left-0 z-20 bg-background">Lecturers</TableHead>
+                  <TableHead className="sticky left-0 z-20 bg-background">
+                    Lecturers
+                  </TableHead>
                   {gradingData.subjects.map((subject: string) => (
                     <TableHead key={subject}>{subject}</TableHead>
                   ))}
@@ -86,7 +88,9 @@ export default function SubjectsGradingTable() {
               <TableBody>
                 {gradingData.lecturers.map((lecturer: string) => (
                   <TableRow key={lecturer}>
-                    <TableCell className="sticky left-0 z-20 bg-background">{lecturer}</TableCell>
+                    <TableCell className="sticky left-0 z-20 bg-background">
+                      {lecturer}
+                    </TableCell>
                     {gradingData.subjects.map((subject: string) => {
                       const lecturerSubjectData =
                         gradingData.data[lecturer]?.[subject];
@@ -134,8 +138,8 @@ export default function SubjectsGradingTable() {
               </TableBody>
             </Table>
           </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+          {/* <ScrollBar orientation="horizontal" /> */}
+        </div>
       </CardContent>
     </Card>
   );
