@@ -100,7 +100,7 @@ export default function SubjectsGradingTable() {
         </div>
         <div className="relative">
           <div className="absolute left-0 top-0 bottom-0 w-40 bg-background z-10" />
-          <ScrollArea className="w-full overflow-auto">
+          <ScrollArea className="w-[1000px] whitespace-nowrap rounded-md border">
             <div className="min-w-max">
               <Table>
                 <TableHeader>
