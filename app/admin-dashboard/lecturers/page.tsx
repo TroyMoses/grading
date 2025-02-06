@@ -17,14 +17,19 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
 
 export default function ManageLecturers() {
   const { toast } = useToast();
   const [selectedLecturerId, setSelectedLecturerId] = useState("");
   const [selectedSubjectId, setSelectedSubjectId] = useState("");
+  const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
 
   const lecturers = useQuery(api.lecturers.getAllLecturers) || [];
-  const subjects = useQuery(api.subjects.getAllSubjects) || [];
+  const subjects =
+    useQuery(api.subjects.getSubjectsBySemester, {
+      semester: selectedSemester || 0,
+    }) || [];
 
   const updateLecturerDetails = useMutation(
     api.lecturerDetails.updateLecturerDetails
@@ -36,6 +41,7 @@ export default function ManageLecturers() {
     const details = {
       lecturerId: selectedLecturerId,
       subjectId: selectedSubjectId,
+      semester: selectedSemester,
       qualification: formData.get("qualification") as string,
       experience: formData.get("experience") as string,
       publications: formData.get("publications") as string,
@@ -59,6 +65,8 @@ export default function ManageLecturers() {
     }
   };
 
+  const years = [1, 2, 3];
+
   return (
     <Card>
       <CardHeader>
@@ -69,7 +77,7 @@ export default function ManageLecturers() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="lecturer">Select Lecturer</Label>
-              <Select onValueChange={setSelectedLecturerId}>
+              <Select onValueChange={(value) => setSelectedLecturerId(value)}>
                 <SelectTrigger id="lecturer">
                   <SelectValue placeholder="Select a lecturer" />
                 </SelectTrigger>
@@ -88,8 +96,22 @@ export default function ManageLecturers() {
               </Select>
             </div>
             <div className="space-y-2">
+              <Label htmlFor="semester">Select Semester</Label>
+              <Select
+                onValueChange={(value) => setSelectedSemester(Number(value))}
+              >
+                <SelectTrigger id="semester">
+                  <SelectValue placeholder="Select a semester" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Semester 1</SelectItem>
+                  <SelectItem value="2">Semester 2</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="subject">Select Subject</Label>
-              <Select onValueChange={setSelectedSubjectId}>
+              <Select onValueChange={(value) => setSelectedSubjectId(value)}>
                 <SelectTrigger id="subject">
                   <SelectValue placeholder="Select a subject" />
                 </SelectTrigger>
@@ -108,7 +130,7 @@ export default function ManageLecturers() {
               </Select>
             </div>
           </div>
-          {selectedLecturerId && selectedSubjectId && (
+          {selectedLecturerId && selectedSubjectId && selectedSemester && (
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="qualification">Qualification</Label>

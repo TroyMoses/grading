@@ -16,6 +16,7 @@ export default defineSchema({
   lecturerDetails: defineTable({
     lecturerId: v.id("lecturers"),
     subjectId: v.id("subjects"),
+    semester: v.number(),
     qualification: v.string(),
     experience: v.string(),
     publications: v.string(),
