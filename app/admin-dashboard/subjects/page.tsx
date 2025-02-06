@@ -11,7 +11,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-// import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useState } from "react";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function calculateWeight(
   criteria: string,
@@ -60,11 +69,12 @@ function calculateWeight(
 }
 
 export default function SubjectsGradingTable() {
-  const gradingData = useQuery(api.lecturerDetails.getGradingData) || {
-    lecturers: [],
-    subjects: [],
-    data: {},
-  };
+  const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
+
+  const gradingData = useQuery(
+    api.lecturerDetails.getGradingData,
+    selectedSemester ? { semester: selectedSemester as 1 | 2 } : {} // ✅ Only pass if defined
+  ) || { lecturers: [], subjects: [], data: {} };
 
   return (
     <Card>
@@ -72,73 +82,92 @@ export default function SubjectsGradingTable() {
         <CardTitle>Subjects Grading Table</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="w-full overflow-auto">
-          <div style={{ minWidth: "1000px" }}>
-            <Table className="table-auto">
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="sticky left-0 z-20 bg-background">
-                    Lecturers
-                  </TableHead>
-                  {gradingData.subjects.map((subject: string) => (
-                    <TableHead key={subject}>{subject}</TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {gradingData.lecturers.map((lecturer: string) => (
-                  <TableRow key={lecturer}>
-                    <TableCell className="sticky left-0 z-20 bg-background">
-                      {lecturer}
-                    </TableCell>
-                    {gradingData.subjects.map((subject: string) => {
-                      const lecturerSubjectData =
-                        gradingData.data[lecturer]?.[subject];
-                      let totalWeight = 0;
-                      if (lecturerSubjectData) {
-                        totalWeight += calculateWeight(
-                          "feedback",
-                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                          //@ts-expect-error
-                          lecturerSubjectData.feedback
-                        );
-                        totalWeight += calculateWeight(
-                          "qualification",
-                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                          //@ts-expect-error
-                          lecturerSubjectData.qualification
-                        );
-                        totalWeight += calculateWeight(
-                          "publications",
-                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                          //@ts-expect-error
-                          lecturerSubjectData.publications
-                        );
-                        totalWeight += calculateWeight(
-                          "experience",
-                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                          //@ts-expect-error
-                          lecturerSubjectData.experience
-                        );
-                        totalWeight += calculateWeight(
-                          "professionalCertificate",
-                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                          //@ts-expect-error
-                          lecturerSubjectData.professionalCertificate
-                        );
-                      }
-                      return (
-                        <TableCell key={`${lecturer}-${subject}`}>
-                          {totalWeight.toFixed(2)}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="space-y-2">
+            <Label htmlFor="semester">Select Semester</Label>
+            <Select
+              onValueChange={(value) => setSelectedSemester(Number(value))}
+            >
+              <SelectTrigger id="semester">
+                <SelectValue placeholder="Select a semester" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">Semester 1</SelectItem>
+                <SelectItem value="2">Semester 2</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          {/* <ScrollBar orientation="horizontal" /> */}
+        </div>
+        <div className="relative">
+          <div className="absolute left-0 top-0 bottom-0 w-40 bg-background z-10" />
+          <ScrollArea className="w-full overflow-auto">
+            <div className="min-w-max">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="sticky left-0 z-20 bg-background">
+                      Lecturers
+                    </TableHead>
+                    {gradingData.subjects.map((subject: string) => (
+                      <TableHead key={subject}>{subject}</TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {gradingData.lecturers.map((lecturer: string) => (
+                    <TableRow key={lecturer}>
+                      <TableCell className="sticky left-0 z-20 bg-background">
+                        {lecturer}
+                      </TableCell>
+                      {gradingData.subjects.map((subject: string) => {
+                        const lecturerSubjectData =
+                          gradingData.data[lecturer]?.[subject];
+                        let totalWeight = 0;
+                        if (lecturerSubjectData) {
+                          totalWeight += calculateWeight(
+                            "feedback",
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            //@ts-expect-error
+                            lecturerSubjectData.feedback
+                          );
+                          totalWeight += calculateWeight(
+                            "qualification",
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            //@ts-expect-error
+                            lecturerSubjectData.qualification
+                          );
+                          totalWeight += calculateWeight(
+                            "publications",
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            //@ts-expect-error
+                            lecturerSubjectData.publications
+                          );
+                          totalWeight += calculateWeight(
+                            "experience",
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            //@ts-expect-error
+                            lecturerSubjectData.experience
+                          );
+                          totalWeight += calculateWeight(
+                            "professionalCertificate",
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            //@ts-expect-error
+                            lecturerSubjectData.professionalCertificate
+                          );
+                        }
+                        return (
+                          <TableCell key={`${lecturer}-${subject}`}>
+                            {totalWeight.toFixed(2)}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
         </div>
       </CardContent>
     </Card>

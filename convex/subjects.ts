@@ -30,13 +30,12 @@ export const getAllSubjects = query({
   },
 });
 
-export const getSubjectsByYearAndSemester = query({
-  args: { year: v.number(), semester: v.number() },
+export const getSubjectsBySemester = query({
+  args: { semester: v.number() },
   handler: async (ctx, args) => {
     return await ctx.db
       .query("subjects")
       .filter((q) => q.and(
-        q.eq(q.field("year"), args.year),
         q.eq(q.field("semester"), args.semester)
       ))
       .collect();
