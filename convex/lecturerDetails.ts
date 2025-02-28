@@ -85,7 +85,7 @@ export const getGradingData = query({
     let lecturerDetails = await ctx.db.query("lecturerDetails").collect();
 
     // Filter lecturerDetails based on year and semester if provided
-    
+
     if (args.semester !== undefined) {
       lecturerDetails = lecturerDetails.filter(
         (detail) => detail.semester === args.semester
@@ -93,6 +93,7 @@ export const getGradingData = query({
     }
 
     const data: { [key: string]: { [key: string]: unknown } } = {};
+    const semesterSubjects = new Set<string>();
 
     lecturerDetails.forEach((detail) => {
       const lecturer = lecturers.find((l) => l._id === detail.lecturerId);
@@ -109,12 +110,13 @@ export const getGradingData = query({
           professionalCertificate: detail.professionalCertificate,
           semester: detail.semester,
         };
+        semesterSubjects.add(subject.name);
       }
     });
 
     return {
       lecturers: lecturers.map((l) => l.name),
-      subjects: subjects.map((s) => s.name),
+      subjects: Array.from(semesterSubjects),
       data,
     };
   },
