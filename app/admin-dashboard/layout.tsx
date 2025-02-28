@@ -51,6 +51,9 @@ export default function AdminDashboardLayout({
               <Button variant="ghost" className="w-full justify-start" asChild>
                 <a href="/admin-dashboard/subjects">Grading Table</a>
               </Button>
+              <Button variant="ghost" className="w-full justify-start" asChild>
+                <a href="/admin-dashboard/assignments">Subject Assignments</a>
+              </Button>
             </nav>
           </div>
         </ScrollArea>

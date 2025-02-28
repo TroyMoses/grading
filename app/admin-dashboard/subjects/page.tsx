@@ -98,77 +98,79 @@ export default function SubjectsGradingTable() {
             </Select>
           </div>
         </div>
-        <div className="relative">
-          <div className="absolute left-0 top-0 bottom-0 w-40 bg-background z-10" />
-          <ScrollArea className="w-[1000px] whitespace-nowrap rounded-md border">
-            <div className="min-w-max">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="sticky left-0 z-20 bg-background">
-                      Lecturers
-                    </TableHead>
-                    {gradingData.subjects.map((subject: string) => (
-                      <TableHead key={subject}>{subject}</TableHead>
-                    ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {gradingData.lecturers.map((lecturer: string) => (
-                    <TableRow key={lecturer}>
-                      <TableCell className="sticky left-0 z-20 bg-background">
-                        {lecturer}
-                      </TableCell>
-                      {gradingData.subjects.map((subject: string) => {
-                        const lecturerSubjectData =
-                          gradingData.data[lecturer]?.[subject];
-                        let totalWeight = 0;
-                        if (lecturerSubjectData) {
-                          totalWeight += calculateWeight(
-                            "feedback",
-                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                            //@ts-expect-error
-                            lecturerSubjectData.feedback
-                          );
-                          totalWeight += calculateWeight(
-                            "qualification",
-                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                            //@ts-expect-error
-                            lecturerSubjectData.qualification
-                          );
-                          totalWeight += calculateWeight(
-                            "publications",
-                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                            //@ts-expect-error
-                            lecturerSubjectData.publications
-                          );
-                          totalWeight += calculateWeight(
-                            "experience",
-                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                            //@ts-expect-error
-                            lecturerSubjectData.experience
-                          );
-                          totalWeight += calculateWeight(
-                            "professionalCertificate",
-                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                            //@ts-expect-error
-                            lecturerSubjectData.professionalCertificate
-                          );
-                        }
-                        return (
-                          <TableCell key={`${lecturer}-${subject}`}>
-                            {totalWeight.toFixed(2)}
-                          </TableCell>
-                        );
-                      })}
+        {selectedSemester && (
+          <div className="relative">
+            <div className="absolute left-0 top-0 bottom-0 w-40 bg-background z-10" />
+            <ScrollArea className="w-[1000px] whitespace-nowrap rounded-md border">
+              <div className="min-w-max">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="sticky left-0 z-20 bg-background">
+                        Lecturers
+                      </TableHead>
+                      {gradingData.subjects.map((subject: string) => (
+                        <TableHead key={subject}>{subject}</TableHead>
+                      ))}
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-        </div>
+                  </TableHeader>
+                  <TableBody>
+                    {gradingData.lecturers.map((lecturer: string) => (
+                      <TableRow key={lecturer}>
+                        <TableCell className="sticky left-0 z-20 bg-background">
+                          {lecturer}
+                        </TableCell>
+                        {gradingData.subjects.map((subject: string) => {
+                          const lecturerSubjectData =
+                            gradingData.data[lecturer]?.[subject];
+                          let totalWeight = 0;
+                          if (lecturerSubjectData) {
+                            totalWeight += calculateWeight(
+                              "feedback",
+                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                              //@ts-expect-error
+                              lecturerSubjectData.feedback
+                            );
+                            totalWeight += calculateWeight(
+                              "qualification",
+                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                              //@ts-expect-error
+                              lecturerSubjectData.qualification
+                            );
+                            totalWeight += calculateWeight(
+                              "publications",
+                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                              //@ts-expect-error
+                              lecturerSubjectData.publications
+                            );
+                            totalWeight += calculateWeight(
+                              "experience",
+                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                              //@ts-expect-error
+                              lecturerSubjectData.experience
+                            );
+                            totalWeight += calculateWeight(
+                              "professionalCertificate",
+                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                              //@ts-expect-error
+                              lecturerSubjectData.professionalCertificate
+                            );
+                          }
+                          return (
+                            <TableCell key={`${lecturer}-${subject}`}>
+                              {totalWeight.toFixed(2)}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
