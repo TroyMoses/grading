@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .text-sidebar-foreground {
+    color: var(--sidebar-foreground);
+  }
+  .bg-sidebar-active {
+    color: var(--sidebar-active);
+  }
+  .text-sidebar-icon {
+    color: var(--sidebar-icon);
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
