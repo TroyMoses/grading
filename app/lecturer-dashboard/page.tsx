@@ -1,23 +1,33 @@
-"use client"
+"use client";
 
-import { useQuery } from "convex/react"
-import { api } from "../../convex/_generated/api"
-import { useAuth } from "@clerk/nextjs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { BookOpen, GraduationCap, Award } from "lucide-react"
+// import { useQuery } from "convex/react"
+// import { api } from "../../convex/_generated/api"
+// import { useAuth } from "@clerk/nextjs"
+import {
+  Card,
+  CardContent,
+  // CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { BookOpen, GraduationCap, Award } from "lucide-react";
 
 export default function LecturerDashboard() {
-  const { userId } = useAuth()
-  const lecturer = useQuery(api.lecturers.getLecturerByClerkId, { clerkId: userId }) || {}
-  const subjects = useQuery(api.lecturerDetails.getSubjectsByLecturerId, { lecturerId: lecturer._id }) || []
+  // const { userId } = useAuth()
+  // const lecturer = useQuery(api.lecturers.getLecturerByClerkId, { clerkId: userId }) || {}
+  // const subjects = useQuery(api.lecturerDetails.getSubjectsByLecturerId, { lecturerId: lecturer._id }) || []
 
   return (
     <div className="space-y-6">
       <div className="gradient-card rounded-lg p-6 text-white">
-        <h2 className="text-2xl font-bold mb-2">Welcome, {lecturer.name || "Lecturer"}</h2>
+        <h2 className="text-2xl font-bold mb-2">
+          Welcome, Lecturer
+          {/* {lecturer.name || "Lecturer"} */}
+        </h2>
         <p className="opacity-90 max-w-3xl">
-          View your assigned subjects and details. Your performance is evaluated based on qualifications, experience,
-          publications, feedback, and professional certifications.
+          View your assigned subjects and details. Your performance is evaluated
+          based on qualifications, experience, publications, feedback, and
+          professional certifications.
         </p>
       </div>
 
@@ -30,7 +40,7 @@ export default function LecturerDashboard() {
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{subjects.length}</div>
+            <div className="text-2xl font-bold">2{/* {subjects.length} */}</div>
             <p className="text-xs text-muted-foreground">Assigned to you</p>
           </CardContent>
         </Card>
@@ -53,13 +63,15 @@ export default function LecturerDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">-</div>
-            <p className="text-xs text-muted-foreground">Based on performance</p>
+            <p className="text-xs text-muted-foreground">
+              Based on performance
+            </p>
           </CardContent>
         </Card>
       </div>
 
       <h2 className="text-2xl font-semibold mt-8">My Subjects</h2>
-      {subjects.length > 0 ? (
+      {/* {subjects.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {subjects.map((subject: any) => (
             <Card key={subject._id}>
@@ -86,8 +98,7 @@ export default function LecturerDashboard() {
         <Card>
           <CardContent className="py-6 text-center text-muted-foreground">No subjects assigned yet.</CardContent>
         </Card>
-      )}
+      )} */}
     </div>
-  )
+  );
 }
-
