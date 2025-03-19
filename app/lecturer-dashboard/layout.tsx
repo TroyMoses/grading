@@ -1,9 +1,9 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Sidebar } from "@/components/sidebar";
 
 export default function LecturerDashboardLayout({
   children,
@@ -27,24 +27,18 @@ export default function LecturerDashboardLayout({
 
   return (
     <div className="flex h-screen bg-background">
-      <aside className="w-64 border-r">
-        <ScrollArea className="h-full">
-          <div className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Lecturer Dashboard</h2>
-            <nav className="space-y-2">
-              <Button variant="ghost" className="w-full justify-start" asChild>
-                <a href="/lecturer-dashboard">Dashboard</a>
-              </Button>
-              <Button variant="ghost" className="w-full justify-start" asChild>
-                <a href="/lecturer-dashboard/subjects">My Subjects</a>
-              </Button>
-            </nav>
+      <Sidebar role="lecturer" />
+      <div className="flex-1 ml-[var(--sidebar-width)]">
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-6">
+          <div className="flex-1">
+            <h1 className="text-xl font-semibold">Lecturer Dashboard</h1>
           </div>
-        </ScrollArea>
-      </aside>
-      <main className="flex-1 p-6 overflow-auto">
-        <ScrollArea className="h-full">{children}</ScrollArea>
-      </main>
+          <UserButton afterSignOutUrl="/" />
+        </header>
+        <main className="flex-1 p-6 overflow-auto">
+          <ScrollArea className="h-full">{children}</ScrollArea>
+        </main>
+      </div>
     </div>
   );
 }
