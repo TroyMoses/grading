@@ -77,18 +77,26 @@ export default function SubjectsGradingTable() {
   ) || { lecturers: [], subjects: [], data: {} };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Subjects Grading Table</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="space-y-2">
+    <div className="space-y-6">
+      <div className="gradient-card rounded-lg p-6 text-white">
+        <h2 className="text-2xl font-bold mb-2">Subjects Grading Table</h2>
+        <p className="opacity-90">
+          View the grading scores for all lecturers across different subjects.
+          Select a semester to filter the results.
+        </p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Subjects Grading Table</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-6 max-w-xs">
             <Label htmlFor="semester">Select Semester</Label>
             <Select
               onValueChange={(value) => setSelectedSemester(Number(value))}
             >
-              <SelectTrigger id="semester">
+              <SelectTrigger id="semester" className="mt-1">
                 <SelectValue placeholder="Select a semester" />
               </SelectTrigger>
               <SelectContent>
@@ -97,81 +105,93 @@ export default function SubjectsGradingTable() {
               </SelectContent>
             </Select>
           </div>
-        </div>
-        {selectedSemester && (
-          <div className="relative">
-            <div className="absolute left-0 top-0 bottom-0 w-40 bg-background z-10" />
-            <ScrollArea className="w-[1000px] whitespace-nowrap rounded-md border">
-              <div className="min-w-max">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="sticky left-0 z-20 bg-background">
-                        Lecturers
-                      </TableHead>
-                      {gradingData.subjects.map((subject: string) => (
-                        <TableHead key={subject}>{subject}</TableHead>
-                      ))}
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {gradingData.lecturers.map((lecturer: string) => (
-                      <TableRow key={lecturer}>
-                        <TableCell className="sticky left-0 z-20 bg-background">
-                          {lecturer}
-                        </TableCell>
-                        {gradingData.subjects.map((subject: string) => {
-                          const lecturerSubjectData =
-                            gradingData.data[lecturer]?.[subject];
-                          let totalWeight = 0;
-                          if (lecturerSubjectData) {
-                            totalWeight += calculateWeight(
-                              "feedback",
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                              //@ts-expect-error
-                              lecturerSubjectData.feedback
-                            );
-                            totalWeight += calculateWeight(
-                              "qualification",
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                              //@ts-expect-error
-                              lecturerSubjectData.qualification
-                            );
-                            totalWeight += calculateWeight(
-                              "publications",
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                              //@ts-expect-error
-                              lecturerSubjectData.publications
-                            );
-                            totalWeight += calculateWeight(
-                              "experience",
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                              //@ts-expect-error
-                              lecturerSubjectData.experience
-                            );
-                            totalWeight += calculateWeight(
-                              "professionalCertificate",
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                              //@ts-expect-error
-                              lecturerSubjectData.professionalCertificate
-                            );
-                          }
-                          return (
-                            <TableCell key={`${lecturer}-${subject}`}>
-                              {totalWeight.toFixed(2)}
-                            </TableCell>
-                          );
-                        })}
+          {selectedSemester ? (
+            <div className="relative rounded-md border">
+              <div className="absolute left-0 top-0 bottom-0 w-40 bg-background z-10" />
+              <ScrollArea className="w-full whitespace-nowrap">
+                <div className="min-w-max">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="sticky left-0 z-20 bg-background">
+                          Lecturers
+                        </TableHead>
+                        {gradingData.subjects.map((subject: string) => (
+                          <TableHead key={subject}>{subject}</TableHead>
+                        ))}
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                    </TableHeader>
+                    <TableBody>
+                      {gradingData.lecturers.map((lecturer: string) => (
+                        <TableRow key={lecturer}>
+                          <TableCell className="sticky left-0 z-20 bg-background font-medium">
+                            {lecturer}
+                          </TableCell>
+                          {gradingData.subjects.map((subject: string) => {
+                            const lecturerSubjectData =
+                              gradingData.data[lecturer]?.[subject];
+                            let totalWeight = 0;
+                            if (lecturerSubjectData) {
+                              totalWeight += calculateWeight(
+                                "feedback",
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                //@ts-expect-error
+                                lecturerSubjectData.feedback
+                              );
+                              totalWeight += calculateWeight(
+                                "qualification",
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                //@ts-expect-error
+                                lecturerSubjectData.qualification
+                              );
+                              totalWeight += calculateWeight(
+                                "publications",
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                //@ts-expect-error
+                                lecturerSubjectData.publications
+                              );
+                              totalWeight += calculateWeight(
+                                "experience",
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                //@ts-expect-error
+                                lecturerSubjectData.experience
+                              );
+                              totalWeight += calculateWeight(
+                                "professionalCertificate",
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                //@ts-expect-error
+                                lecturerSubjectData.professionalCertificate
+                              );
+                            }
+                            return (
+                              <TableCell key={`${lecturer}-${subject}`}>
+                                <span
+                                  className={
+                                    totalWeight > 0
+                                      ? "font-medium"
+                                      : "text-muted-foreground"
+                                  }
+                                >
+                                  {totalWeight.toFixed(2)}
+                                </span>
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
+            </div>
+          ) : (
+            <div className="text-center py-10 text-muted-foreground">
+              Please select a semester to view the grading table
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
