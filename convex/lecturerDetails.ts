@@ -333,7 +333,7 @@ export const getAssignmentData = query({
   },
 })
 
-// Helper function to calculate total weight
+// A helper function to calculate total weight
 function calculateTotalWeight(
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 detail: any): number {
@@ -350,7 +350,7 @@ detail: any): number {
 function calculateWeight(criteria: string, value: string | number | boolean | undefined): number {
   if (value === undefined) return 0
 
-  // Normalize the value for consistent mapping
+  // Normalizing the value for consistent mapping
   const normalizedValue = value.toString().trim()
 
   const weights = {
