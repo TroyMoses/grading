@@ -90,7 +90,7 @@ export default function AssignmentTable() {
                                     return total + calculateWeight(criteria, value as any)
                                   }, 0)
                               : 0
-
+                            // Return
                             return (
                               <TableCell key={`${lecturer}-${subject}`}>
                                 <div className="flex flex-col">
