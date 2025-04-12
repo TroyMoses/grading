@@ -53,11 +53,18 @@ export const updateLecturerDetails = mutation({
   args: {
     lecturerId: v.id("lecturers"),
     subjectId: v.id("subjects"),
+    year: v.union(v.literal(1), v.literal(2), v.literal(3)),
     semester: v.union(v.literal(1), v.literal(2)),
     qualification: v.string(),
     experience: v.string(),
     publications: v.string(),
-    feedback: v.string(),
+    feedback: v.union(
+      v.literal("Above 80"),
+      v.literal("70-79"),
+      v.literal("60-69"),
+      v.literal("50-59"),
+      v.literal("Below 50")
+    ),
     professionalCertificate: v.boolean(),
   },
   handler: async (ctx, args) => {
@@ -84,8 +91,7 @@ export const getGradingData = query({
     const subjects = await ctx.db.query("subjects").collect();
     let lecturerDetails = await ctx.db.query("lecturerDetails").collect();
 
-    // Filter lecturerDetails based on year and semester if provided
-
+    // Filter lecturerDetails based on semester if provided
     if (args.semester !== undefined) {
       lecturerDetails = lecturerDetails.filter(
         (detail) => detail.semester === args.semester
@@ -167,6 +173,7 @@ export const getSubjectsByLecturerId = query({
   },
 });
 
+// Update the getAssignmentData function with the new assignment logic
 export const getAssignmentData = query({
   args: {
     semester: v.optional(v.union(v.literal(1), v.literal(2))),
@@ -183,9 +190,11 @@ export const getAssignmentData = query({
       );
     }
 
+    // Create a data structure to hold weights for each lecturer-subject pair
     const data: { [key: string]: { [key: string]: number } } = {};
     const semesterSubjects = new Set<string>();
 
+    // Calculate weights for each lecturer-subject pair
     lecturerDetails.forEach((detail) => {
       const lecturer = lecturers.find((l) => l._id === detail.lecturerId);
       const subject = subjects.find((s) => s._id === detail.subjectId);
@@ -200,39 +209,93 @@ export const getAssignmentData = query({
     });
 
     const sortedSubjects = Array.from(semesterSubjects).sort();
-    const assignments: { [key: string]: { [key: string]: string } } = {};
+    const lecturerNames = lecturers.map((l) => l.name);
 
-    lecturers.forEach((lecturer) => {
-      assignments[lecturer.name] = {};
+    // Initialize assignments with "Not Assigned" for all lecturer-subject pairs
+    const assignments: { [key: string]: { [key: string]: string } } = {};
+    lecturerNames.forEach((lecturer) => {
+      assignments[lecturer] = {};
       sortedSubjects.forEach((subject) => {
-        assignments[lecturer.name][subject] = "Not Assigned";
+        assignments[lecturer][subject] = "Not Assigned";
       });
     });
 
     const maxAssignments = 2;
     const assignedCounts: { [key: string]: number } = {};
-
-    sortedSubjects.forEach((subject) => {
-      const lecturerGrades = Object.entries(data).map(([lecturer, grades]) => ({
-        lecturer,
-        grade: grades[subject] || 0,
-      }));
-
-      lecturerGrades.sort((a, b) => b.grade - a.grade);
-
-      for (const { lecturer, grade } of lecturerGrades) {
-        if (grade === 0) continue;
-        if (!assignedCounts[lecturer]) assignedCounts[lecturer] = 0;
-        if (assignedCounts[lecturer] < maxAssignments) {
-          assignments[lecturer][subject] = "Assigned";
-          assignedCounts[lecturer]++;
-          break;
-        }
-      }
+    lecturerNames.forEach((lecturer) => {
+      assignedCounts[lecturer] = 0;
     });
 
+    // New assignment logic
+    // Process each lecturer in order
+    for (const lecturer of lecturerNames) {
+      // Skip if lecturer already has maximum assignments
+      if (assignedCounts[lecturer] >= maxAssignments) continue;
+
+      // Get all subjects with weights for this lecturer
+      const lecturerSubjects = Object.entries(data[lecturer] || {})
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .filter(([_, weight]) => weight > 0) // Only consider subjects with positive weights
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .sort(([, weightA], [, weightB]) => weightB - weightA); // Sort by weight descending
+
+      // Try to assign subjects to this lecturer, starting with their highest weighted subject
+      for (const [subject, weight] of lecturerSubjects) {
+        // Skip if lecturer already has maximum assignments
+        if (assignedCounts[lecturer] >= maxAssignments) break;
+
+        // Check if this lecturer has the highest weight for this subject
+        let hasHighestWeight = true;
+        for (const otherLecturer of lecturerNames) {
+          if (otherLecturer === lecturer) continue; // Skip comparing with self
+
+          const otherWeight = data[otherLecturer]?.[subject] || 0;
+          if (otherWeight > weight) {
+            hasHighestWeight = false;
+            break;
+          }
+        }
+
+        // If this lecturer has the highest weight for this subject, assign it
+        if (hasHighestWeight) {
+          assignments[lecturer][subject] = "Assigned";
+          assignedCounts[lecturer]++;
+        }
+      }
+    }
+
+    // Second pass: For any unassigned subjects, assign to the lecturer with the highest weight
+    for (const subject of sortedSubjects) {
+      // Check if the subject is already assigned to someone
+      const isAssigned = lecturerNames.some(
+        (lecturer) => assignments[lecturer][subject] === "Assigned"
+      );
+
+      if (!isAssigned) {
+        // Find the lecturer with the highest weight who hasn't reached max assignments
+        let bestLecturer = null;
+        let bestWeight = -1;
+
+        for (const lecturer of lecturerNames) {
+          if (assignedCounts[lecturer] >= maxAssignments) continue;
+
+          const weight = data[lecturer]?.[subject] || 0;
+          if (weight > bestWeight) {
+            bestWeight = weight;
+            bestLecturer = lecturer;
+          }
+        }
+
+        // Assign the subject if we found an eligible lecturer
+        if (bestLecturer && bestWeight > 0) {
+          assignments[bestLecturer][subject] = "Assigned";
+          assignedCounts[bestLecturer]++;
+        }
+      }
+    }
+
     return {
-      lecturers: lecturers.map((l) => l.name),
+      lecturers: lecturerNames,
       subjects: sortedSubjects,
       assignments,
     };
@@ -241,7 +304,7 @@ export const getAssignmentData = query({
 
 // Helper function to calculate total weight
 function calculateTotalWeight(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment, @typescript-eslint/no-explicit-any
   detail: any
 ): number {
   let totalWeight = 0;
