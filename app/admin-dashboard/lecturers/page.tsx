@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/ui/button";
@@ -20,18 +18,39 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function ManageLecturers() {
   const { toast } = useToast();
   const [selectedLecturerId, setSelectedLecturerId] = useState("");
   const [selectedSubjectId, setSelectedSubjectId] = useState("");
   const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
+  const [feedbackValue, setFeedbackValue] = useState("");
 
   const lecturers = useQuery(api.lecturers.getAllLecturers) || [];
   const subjects =
     useQuery(api.subjects.getSubjectsBySemester, {
       semester: selectedSemester || 0,
     }) || [];
+
+  // Get feedback stats for the selected lecturer and subject
+  const feedbackStatsData = useQuery(api.studentFeedback.getFeedbackStats, {
+    lecturerId: selectedLecturerId as Id<"lecturers">,
+    subjectId: selectedSubjectId as Id<"subjects">,
+  });
+
+  const feedbackStats = useMemo(() => {
+    return feedbackStatsData || { feedbackRange: "" };
+  }, [feedbackStatsData]);
+
+  // Update feedback value when stats change
+  useEffect(() => {
+    if (feedbackStats && feedbackStats.feedbackRange !== "No feedback yet") {
+      setFeedbackValue(feedbackStats.feedbackRange);
+    } else {
+      setFeedbackValue("");
+    }
+  }, [feedbackStats]);
 
   const updateLecturerDetails = useMutation(
     api.lecturerDetails.updateLecturerDetails
@@ -47,7 +66,7 @@ export default function ManageLecturers() {
       qualification: formData.get("qualification") as string,
       experience: formData.get("experience") as string,
       publications: formData.get("publications") as string,
-      feedback: formData.get("feedback") as string,
+      feedback: feedbackValue,
       professionalCertificate: formData.get("professionalCertificate") === "on",
     };
     try {
@@ -58,6 +77,7 @@ export default function ManageLecturers() {
         title: "Success",
         description: "Lecturer details updated successfully.",
       });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({
         title: "Error",
@@ -67,6 +87,7 @@ export default function ManageLecturers() {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const years = [1, 2, 3];
 
   return (
@@ -76,6 +97,7 @@ export default function ManageLecturers() {
         <p className="opacity-90">
           Update lecturer details for specific subjects. Select a lecturer,
           year, semester, and subject, then provide the qualification details.
+          Feedback is automatically calculated from student evaluations.
         </p>
       </div>
 
@@ -204,18 +226,25 @@ export default function ManageLecturers() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="feedback">Feedback</Label>
-                    <Select name="feedback">
-                      <SelectTrigger id="feedback">
-                        <SelectValue placeholder="Select feedback" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Above 80">Above 80</SelectItem>
-                        <SelectItem value="70-79">70-79</SelectItem>
-                        <SelectItem value="60-69">60-69</SelectItem>
-                        <SelectItem value="50-59">50-59</SelectItem>
-                        <SelectItem value="Below 50">Below 50</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Input
+                      id="feedback"
+                      name="feedback"
+                      value={feedbackValue}
+                      disabled
+                      className="bg-muted/50"
+                      placeholder={
+                        "count" in feedbackStats && feedbackStats.count > 0
+                          ? feedbackValue
+                          : "No student feedback yet"
+                      }
+                    />
+                    {"count" in feedbackStats && feedbackStats.count > 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        Based on {feedbackStats.count} student evaluations with
+                        average score of {feedbackStats.averageScore.toFixed(2)}
+                        /100
+                      </p>
+                    )}
                   </div>
                   <div className="col-span-2 flex items-center space-x-2">
                     <Checkbox

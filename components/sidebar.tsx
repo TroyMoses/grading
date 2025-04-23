@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Users, BookOpen, GraduationCap, Award, Menu, X } from "lucide-react"
+import { LayoutDashboard, Users, BookOpen, GraduationCap, Award, Menu, X, MessageSquare } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -63,6 +63,11 @@ export function Sidebar({ role }: SidebarProps) {
       href: "/lecturer-dashboard/subjects",
       label: "My Subjects",
       icon: BookOpen,
+    },
+    {
+      href: "/student-feedback",
+      label: "Student Feedback",
+      icon: MessageSquare,
     },
   ]
 
