@@ -51,7 +51,6 @@ export const updateLecturerDetails = mutation({
   args: {
     lecturerId: v.id("lecturers"),
     subjectId: v.id("subjects"),
-    year: v.union(v.literal(1), v.literal(2), v.literal(3)),
     semester: v.union(v.literal(1), v.literal(2)),
     qualification: v.string(),
     experience: v.string(),
