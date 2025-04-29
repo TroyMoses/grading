@@ -65,7 +65,17 @@ export default function StudentFeedback() {
   const awardTypes = useQuery(api.studentFeedback.getAwardTypes) || [];
   const yearsOfStudy = useQuery(api.studentFeedback.getYearsOfStudy) || [];
   const lecturers = useQuery(api.lecturers.getAllLecturers) || [];
-  const subjects = useQuery(api.subjects.getAllSubjects) || [];
+
+  // Get subjects filtered by semester
+  const allSubjects = useQuery(api.subjects.getAllSubjects) || [];
+  const semesterSubjects = semester
+    ? allSubjects.filter((subject: any) => subject.semester === semester)
+    : [];
+
+  // Reset subject selection when semester changes
+  useEffect(() => {
+    setSubjectId("");
+  }, [semester]);
 
   // Mutations
   const submitFeedback = useMutation(api.studentFeedback.submitFeedback);
@@ -339,12 +349,21 @@ export default function StudentFeedback() {
 
                 <div className="space-y-2">
                   <Label htmlFor="subject">Subject</Label>
-                  <Select onValueChange={setSubjectId} required>
+                  <Select
+                    onValueChange={setSubjectId}
+                    value={subjectId}
+                    disabled={!semester}
+                    required
+                  >
                     <SelectTrigger id="subject">
-                      <SelectValue placeholder="Select subject" />
+                      <SelectValue
+                        placeholder={
+                          semester ? "Select subject" : "Select semester first"
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      {subjects.map(
+                      {semesterSubjects.map(
                         (
                           // eslint-disable-next-line @typescript-eslint/no-explicit-any
                           subject: any
@@ -356,6 +375,11 @@ export default function StudentFeedback() {
                       )}
                     </SelectContent>
                   </Select>
+                  {!semester && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Please select a semester first
+                    </p>
+                  )}
                 </div>
               </div>
             </CardContent>
