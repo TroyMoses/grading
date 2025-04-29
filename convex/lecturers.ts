@@ -27,10 +27,24 @@ export const createLecturer = mutation({
     userId: v.string(),
   },
   handler: async (ctx, args) => {
+    // Check if a lecturer with the same name already exists
+    const existingLecturerByName = await ctx.db
+      .query("lecturers")
+      .filter((q) => q.eq(q.field("name"), args.name))
+      .first();
+
+    if (existingLecturerByName) {
+      return {
+        error: "A lecturer with this name already exists",
+        _id: existingLecturerByName._id,
+      };
+    }
+
+    // If no duplicates found, insert the new lecturer
     const lecturerId = await ctx.db.insert("lecturers", {
-      name: args.name, userId: args.userId
+      name: args.name,
+      userId: args.userId,
     });
-    return lecturerId
+    return { _id: lecturerId }
   },
 });
-

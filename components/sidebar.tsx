@@ -11,6 +11,7 @@ import {
   Menu,
   X,
   MessageSquare,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -59,6 +60,11 @@ export function Sidebar({ role }: SidebarProps) {
       href: "/admin-dashboard/assignments",
       label: "Subject Assignments",
       icon: Award,
+    },
+    {
+      href: "/admin-dashboard/reports",
+      label: "Assignment Reports",
+      icon: FileText,
     },
     {
       href: "/student-feedback",

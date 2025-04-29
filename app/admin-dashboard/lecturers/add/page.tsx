@@ -19,13 +19,22 @@ export default function AddLecturer() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createLecturer({ name, userId: user?.id ?? "" });
-      setName("");
-      toast({
-        title: "Success",
-        description: "Lecturer added successfully.",
-      });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const result = await createLecturer({ name, userId: user?.id ?? "" });
+
+      if (result.error) {
+        toast({
+          title: "Warning",
+          description: result.error,
+          variant: "destructive",
+        });
+      } else {
+        setName("");
+        toast({
+          title: "Success",
+          description: "Lecturer added successfully.",
+        });
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({
         title: "Error",
