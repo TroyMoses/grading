@@ -121,6 +121,7 @@ export default function StudentFeedback() {
         semester: semester || 1,
         academicYear,
         modeOfStudy,
+        yearOfStudy,
         awardType,
         lecturerId: lecturerId as Id<"lecturers">,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -319,15 +320,14 @@ export default function StudentFeedback() {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="lecturer">Lecturer</Label>
                   <Select onValueChange={setLecturerId} required>
                     <SelectTrigger id="lecturer">
                       <SelectValue placeholder="Select lecturer" />
                     </SelectTrigger>
                     <SelectContent>
                       {lecturers.map(
-                        (
-                            lecturer: { _id: string; name: string }
-                        ) => (
+                        (lecturer: { _id: string; name: string }) => (
                           <SelectItem key={lecturer._id} value={lecturer._id}>
                             {lecturer.name}
                           </SelectItem>

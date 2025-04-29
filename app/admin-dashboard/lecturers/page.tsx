@@ -1,8 +1,8 @@
 "use client";
 
-import type React from "react";
+import React from "react";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/ui/button";
@@ -33,15 +33,15 @@ export default function ManageLecturers() {
       semester: selectedSemester || 0,
     }) || [];
 
-  // Get feedback stats for the selected lecturer and subject
-  const feedbackStatsData = useQuery(api.studentFeedback.getFeedbackStats, {
-    lecturerId: selectedLecturerId as Id<"lecturers">,
-    subjectId: selectedSubjectId as Id<"subjects">,
+  // Pass undefined when no selection is made
+  const feedbackQuery = useQuery(api.studentFeedback.getFeedbackStats, {
+    lecturerId: (selectedLecturerId as Id<"lecturers">) || undefined,
+    subjectId: (selectedSubjectId as Id<"subjects">) || undefined,
   });
 
-  const feedbackStats = useMemo(() => {
-    return feedbackStatsData || { feedbackRange: "" };
-  }, [feedbackStatsData]);
+  const feedbackStats = React.useMemo(() => {
+    return feedbackQuery || { feedbackRange: "", count: 0, averageScore: 0 };
+  }, [feedbackQuery]);
 
   // Update feedback value when stats change
   useEffect(() => {
@@ -176,19 +176,24 @@ export default function ManageLecturers() {
                         <SelectValue placeholder="Select qualification" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Degree">Degree</SelectItem>
-                        <SelectItem value="Degree-Master[not align]">
-                          Degree-Master (not align)
-                        </SelectItem>
+                        <SelectItem value="Degree[align]">Degree (align)</SelectItem>
+                        <SelectItem value="Degree[not align]">Degree (not align)</SelectItem>
                         <SelectItem value="Degree-Master[align]">
                           Degree-Master (align)
                         </SelectItem>
-                        <SelectItem value="Degree-Master-PhD[not align]">
-                          Degree-Master-PhD (not align)
+                        <SelectItem value="Degree-Master[not align]">
+                          Degree-Master (not align)
                         </SelectItem>
                         <SelectItem value="Degree-Master-PhD[align]">
                           Degree-Master-PhD (align)
                         </SelectItem>
+                        <SelectItem value="Degree-Master-PhD[not align]">
+                          Degree-Master-PhD (not align)
+                        </SelectItem>
+                        <SelectItem value="Degree-Master-PhD-Senior-Lecturer[align]">
+                        Degree-Master-PhD-Senior-Lecturer (align)
+                        </SelectItem>
+                        <SelectItem value="Degree-Master-PhD-Professor">Degree-Master-PhD-Professor</SelectItem>
                         <SelectItem value="Professor">Professor</SelectItem>
                       </SelectContent>
                     </Select>

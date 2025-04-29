@@ -98,27 +98,33 @@ async function updateLecturerFeedback(
   subjectId: string
 ) {
   // Get all feedback for this lecturer-subject pair
-  interface StudentFeedback {
+  interface Feedback {
+    _id: string;
     lecturerId: string;
     subjectId: string;
     totalScore: number;
   }
 
-  const feedbacks: StudentFeedback[] = await ctx.db
+  const feedbacks: Feedback[] = await ctx.db
     .query("studentFeedback")
     .withIndex(
       "by_lecturer_subject",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (q: { eq: (field: string, value: string) => any }) =>
-        q.eq("lecturerId", lecturerId).eq("subjectId", subjectId)
+      (q: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        eq: (field: string, value: string) => any;
+      }) => q.eq("lecturerId", lecturerId).eq("subjectId", subjectId)
     )
     .collect();
 
   if (feedbacks.length === 0) return;
 
   // Calculate average score
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const totalScores = feedbacks.map((f: any) => f.totalScore);
+  const totalScores = feedbacks.map(
+    (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      f: any
+    ) => f.totalScore
+  );
   const averageScore =
     totalScores.reduce((sum: number, score: number) => sum + score, 0) /
     totalScores.length;
@@ -141,22 +147,28 @@ async function updateLecturerFeedback(
   }
 
   // Find existing lecturer details
-  const lecturerDetails: {
+  interface LecturerDetails {
     _id: string;
     lecturerId: string;
     subjectId: string;
     feedback?: string;
-  } | null = await ctx.db
+  }
+
+  const lecturerDetails: LecturerDetails | null = await ctx.db
     .query("lecturerDetails")
     .filter(
       (q: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        eq: (field: string, value: string) => any;
-        field: (name: string) => string;
+        and: (...conditions: any[]) => any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        eq: (field: any, value: any) => any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        field: (name: string) => any;
       }) =>
-        q
-          .eq(q.field("lecturerId"), lecturerId)
-          .eq(q.field("subjectId"), subjectId)
+        q.and(
+          q.eq(q.field("lecturerId"), lecturerId),
+          q.eq(q.field("subjectId"), subjectId)
+        )
     )
     .first();
 
@@ -171,11 +183,21 @@ async function updateLecturerFeedback(
 // Get feedback statistics for a lecturer-subject pair
 export const getFeedbackStats = query({
   args: {
-    lecturerId: v.id("lecturers"),
-    subjectId: v.id("subjects"),
+    lecturerId: v.optional(v.id("lecturers")),
+    subjectId: v.optional(v.id("subjects")),
   },
   handler: async (ctx, args) => {
     const { lecturerId, subjectId } = args;
+
+    // If either ID is missing, return default values
+    if (!lecturerId || !subjectId) {
+      return {
+        count: 0,
+        averageScore: 0,
+        percentageScore: 0,
+        feedbackRange: "No feedback yet",
+      };
+    }
 
     // Get all feedback for this lecturer-subject pair
     const feedbacks = await ctx.db
