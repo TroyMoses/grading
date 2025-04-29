@@ -51,20 +51,32 @@ export default function ManageSubjects() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createSubjects({
+      const result = await createSubjects({
         year,
         semester,
         department,
         subjects: subjects.filter((s) => s.trim() !== ""),
       });
+      // Handle the response
+      if (result.createdSubjects && result.createdSubjects.length > 0) {
+        toast({
+          title: "Success",
+          description: result.message || "Subjects added successfully.",
+        });
+      } else {
+        toast({
+          title: "Information",
+          description: result.message || "No new subjects were added.",
+          variant: "default",
+        });
+      }
+
+      // Reset form
       setYear(1);
       setSemester(1);
       setSubjects([""]);
       setDepartment("");
-      toast({
-        title: "Success",
-        description: "Subjects added successfully.",
-      });
+
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({

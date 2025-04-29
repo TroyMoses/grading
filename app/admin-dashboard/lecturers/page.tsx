@@ -72,10 +72,12 @@ export default function ManageLecturers() {
     try {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       //@ts-expect-error
-      await updateLecturerDetails(details);
+      const result = await updateLecturerDetails(details);
       toast({
         title: "Success",
-        description: "Lecturer details updated successfully.",
+        description: result.updated
+          ? "Lecturer details updated successfully."
+          : "Lecturer details added successfully.",
       });
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
@@ -176,8 +178,12 @@ export default function ManageLecturers() {
                         <SelectValue placeholder="Select qualification" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Degree[align]">Degree (align)</SelectItem>
-                        <SelectItem value="Degree[not align]">Degree (not align)</SelectItem>
+                        <SelectItem value="Degree[align]">
+                          Degree (align)
+                        </SelectItem>
+                        <SelectItem value="Degree[not align]">
+                          Degree (not align)
+                        </SelectItem>
                         <SelectItem value="Degree-Master[align]">
                           Degree-Master (align)
                         </SelectItem>
@@ -191,9 +197,11 @@ export default function ManageLecturers() {
                           Degree-Master-PhD (not align)
                         </SelectItem>
                         <SelectItem value="Degree-Master-PhD-Senior-Lecturer[align]">
-                        Degree-Master-PhD-Senior-Lecturer (align)
+                          Degree-Master-PhD-Senior-Lecturer (align)
                         </SelectItem>
-                        <SelectItem value="Degree-Master-PhD-Professor">Degree-Master-PhD-Professor</SelectItem>
+                        <SelectItem value="Degree-Master-PhD-Professor">
+                          Degree-Master-PhD-Professor
+                        </SelectItem>
                         <SelectItem value="Professor">Professor</SelectItem>
                       </SelectContent>
                     </Select>
