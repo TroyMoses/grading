@@ -69,7 +69,7 @@ export default function StudentFeedback() {
   // Get subjects filtered by semester
   const allSubjects = useQuery(api.subjects.getAllSubjects) || [];
   const semesterSubjects = semester
-    ? allSubjects.filter((subject: any) => subject.semester === semester)
+    ? allSubjects.filter((subject: { semester: number }) => subject.semester === semester)
     : [];
 
   // Reset subject selection when semester changes
