@@ -1,19 +1,28 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { LayoutDashboard, Users, BookOpen, GraduationCap, Award, Menu, X } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  LayoutDashboard,
+  Users,
+  BookOpen,
+  GraduationCap,
+  Award,
+  Menu,
+  X,
+  MessageSquare,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 interface SidebarProps {
-  role: "admin" | "lecturer"
+  role: "admin" | "lecturer";
 }
 
 export function Sidebar({ role }: SidebarProps) {
-  const pathname = usePathname()
-  const [collapsed, setCollapsed] = useState(false)
+  const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
 
   const adminLinks = [
     {
@@ -51,7 +60,12 @@ export function Sidebar({ role }: SidebarProps) {
       label: "Subject Assignments",
       icon: Award,
     },
-  ]
+    {
+      href: "/student-feedback",
+      label: "Student Feedback",
+      icon: MessageSquare,
+    },
+  ];
 
   const lecturerLinks = [
     {
@@ -64,15 +78,20 @@ export function Sidebar({ role }: SidebarProps) {
       label: "My Subjects",
       icon: BookOpen,
     },
-  ]
+    {
+      href: "/student-feedback",
+      label: "Student Feedback",
+      icon: MessageSquare,
+    },
+  ];
 
-  const links = role === "admin" ? adminLinks : lecturerLinks
+  const links = role === "admin" ? adminLinks : lecturerLinks;
 
   return (
     <div
       className={cn(
         "fixed inset-y-0 left-0 z-50 flex flex-col bg-[hsl(var(--sidebar-background))] transition-all duration-300",
-        collapsed ? "w-16" : "w-[var(--sidebar-width)]",
+        collapsed ? "w-16" : "w-[var(--sidebar-width)]"
       )}
     >
       <div className="flex items-center justify-between p-4">
@@ -97,7 +116,11 @@ export function Sidebar({ role }: SidebarProps) {
             <Link
               key={link.href}
               href={link.href}
-              className={cn("sidebar-link", pathname === link.href && "active", collapsed && "justify-center px-2")}
+              className={cn(
+                "sidebar-link",
+                pathname === link.href && "active",
+                collapsed && "justify-center px-2"
+              )}
             >
               <link.icon className="h-5 w-5" />
               {!collapsed && <span>{link.label}</span>}
@@ -106,6 +129,5 @@ export function Sidebar({ role }: SidebarProps) {
         </nav>
       </div>
     </div>
-  )
+  );
 }
-
