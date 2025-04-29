@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 
 interface EditLecturerDetailsFormProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   detail: any;
   onClose: () => void;
 }
@@ -61,6 +62,7 @@ export function EditLecturerDetailsForm({
         description: "Lecturer details updated successfully.",
       });
       onClose();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({
         title: "Error",
