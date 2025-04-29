@@ -430,7 +430,7 @@ function calculateWeight(
       "Degree-Master-PhD[not align]": 2,
       "Degree-Master-PhD-Senior-Lecturer[align]": 4,
       "Degree-Master-PhD-Professor": 5,
-      Professor: 6,
+      "Professor": 6,
     },
     publications: { None: 0, "1-2": 1, "3-4": 2, "5-6": 3, "7-8": 4, "9+": 5 },
     experience: { "0": 1, "1-3": 2, "4-6": 3, "7-9": 4, "10+": 5 },

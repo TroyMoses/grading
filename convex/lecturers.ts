@@ -45,6 +45,40 @@ export const createLecturer = mutation({
       name: args.name,
       userId: args.userId,
     });
-    return { _id: lecturerId }
+    return { _id: lecturerId };
+  },
+});
+
+// Update lecturer name
+export const updateLecturerName = mutation({
+  args: {
+    id: v.id("lecturers"),
+    name: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { id, name } = args;
+
+    // Check if a lecturer with the same name already exists
+    const existingLecturer = await ctx.db
+      .query("lecturers")
+      .filter((q) =>
+        q.and(q.eq(q.field("name"), name), q.neq(q.field("_id"), id))
+      )
+      .first();
+
+    if (existingLecturer) {
+      return {
+        success: false,
+        message: "A lecturer with this name already exists",
+      };
+    }
+
+    // Update the lecturer name
+    await ctx.db.patch(id, { name });
+
+    return {
+      success: true,
+      message: "Lecturer name updated successfully",
+    };
   },
 });
