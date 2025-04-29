@@ -37,13 +37,18 @@ export function Sidebar({ role }: SidebarProps) {
       icon: Users,
     },
     {
+      href: "/admin-dashboard/lecturers/manage",
+      label: "View Lecturers",
+      icon: Users,
+    },
+    {
       href: "/admin-dashboard/lecturers/add",
       label: "Add Lecturer",
       icon: Users,
     },
     {
       href: "/admin-dashboard/lecturers/view",
-      label: "View Lecturers",
+      label: "View Lecturer Details",
       icon: Users,
     },
     {

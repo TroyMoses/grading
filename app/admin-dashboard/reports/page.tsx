@@ -22,9 +22,11 @@ import {
 } from "@/components/ui/select";
 import { FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SearchInput } from "@/components/search-input";
 
 export default function AssignmentReports() {
   const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const assignmentData = useQuery(
     api.lecturerDetails.getAssignmentData,
@@ -61,15 +63,23 @@ export default function AssignmentReports() {
         .filter(Boolean)
     : [];
 
+  // Filter lecturers based on search query
+  const filteredLecturers = lecturersWithMaxAssignments.filter(
+    (lecturer) =>
+      lecturer?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      lecturer?.subject1.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      lecturer?.subject2.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   // Function to export data as CSV
   const exportToCSV = () => {
-    if (lecturersWithMaxAssignments.length === 0) return;
+    if (filteredLecturers.length === 0) return;
 
     // Create CSV content
     const headers = ["Lecturer", "Subject 1", "Subject 2", "Total Weight"];
     const csvContent = [
       headers.join(","),
-      ...lecturersWithMaxAssignments
+      ...filteredLecturers
         .filter(
           (lecturer): lecturer is NonNullable<typeof lecturer> =>
             lecturer !== null
@@ -108,16 +118,25 @@ export default function AssignmentReports() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Assigned Subjects Report</CardTitle>
-          {lecturersWithMaxAssignments.length > 0 && (
-            <Button
-              onClick={exportToCSV}
-              size="sm"
-              className="flex items-center gap-1"
-            >
-              <FileDown className="h-4 w-4" />
-              Export CSV
-            </Button>
-          )}
+          <div className="flex items-center gap-4">
+            <div className="w-72">
+              <SearchInput
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder="Search lecturers or subjects..."
+              />
+            </div>
+            {filteredLecturers.length > 0 && (
+              <Button
+                onClick={exportToCSV}
+                size="sm"
+                className="flex items-center gap-1"
+              >
+                <FileDown className="h-4 w-4" />
+                Export CSV
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <div className="mb-6 max-w-xs">
@@ -136,7 +155,7 @@ export default function AssignmentReports() {
           </div>
 
           {selectedSemester ? (
-            lecturersWithMaxAssignments.length > 0 ? (
+            filteredLecturers.length > 0 ? (
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -147,7 +166,7 @@ export default function AssignmentReports() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {lecturersWithMaxAssignments
+                  {filteredLecturers
                     .filter(
                       (lecturer): lecturer is NonNullable<typeof lecturer> =>
                         lecturer !== null

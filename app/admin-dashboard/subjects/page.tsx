@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SearchInput } from "@/components/search-input";
 
 function calculateWeight(
   criteria: string,
@@ -48,21 +49,22 @@ function calculateWeight(
       "Below 50": 1,
     },
     qualification: {
-      Degree: 1,
-      "Degree-Master[not align]": 2,
-      "Degree-Master[align]": 3,
-      "Degree-Master-PhD[not align]": 4,
-      "Degree-Master-PhD[align]": 5,
-      Professor: 6,
+      "Degree[align]": 1,
+      "Degree[not align]": 0,
+      "Degree-Master[align]": 2,
+      "Degree-Master[not align]": 1,
+      "Degree-Master-PhD[align]": 3,
+      "Degree-Master-PhD[not align]": 2,
+      "Degree-Master-PhD-Senior-Lecturer[align]": 4,
+      "Degree-Master-PhD-Professor": 5,
+      "Professor": 6,
     },
     publications: { None: 0, "1-2": 1, "3-4": 2, "5-6": 3, "7-8": 4, "9+": 5 },
     experience: { "0": 1, "1-3": 2, "4-6": 3, "7-9": 4, "10+": 5 },
     professionalCertificate: { true: 1, false: 0 },
   };
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //@ts-expect-error
-  const weight = weights[criteria] || 0;
+  const weight = weights[criteria as keyof typeof weights] || 0;
   const scale = scales[criteria]?.[normalizedValue] || 0;
 
   return weight * scale;
@@ -70,11 +72,17 @@ function calculateWeight(
 
 export default function SubjectsGradingTable() {
   const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const gradingData = useQuery(
     api.lecturerDetails.getGradingData,
     selectedSemester ? { semester: selectedSemester as 1 | 2 } : {} // ✅ Only pass if defined
   ) || { lecturers: [], subjects: [], data: {} };
+
+  // Filter lecturers based on search query
+  const filteredLecturers = gradingData.lecturers.filter((lecturer: string) =>
+    lecturer.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
@@ -87,8 +95,15 @@ export default function SubjectsGradingTable() {
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Subjects Grading Table</CardTitle>
+          <div className="w-72">
+            <SearchInput
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search lecturers..."
+            />
+          </div>
         </CardHeader>
         <CardContent>
           <div className="mb-6 max-w-xs">
@@ -122,7 +137,7 @@ export default function SubjectsGradingTable() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {gradingData.lecturers.map((lecturer: string) => (
+                      {filteredLecturers.map((lecturer: string) => (
                         <TableRow key={lecturer}>
                           <TableCell className="sticky left-0 z-20 bg-background font-medium">
                             {lecturer}

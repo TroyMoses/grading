@@ -74,6 +74,54 @@ export const createSubjects = mutation({
   },
 });
 
+export const updateSubject = mutation({
+  args: {
+    id: v.id("subjects"),
+    name: v.string(),
+    year: v.number(),
+    semester: v.number(),
+    department: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { id, name, year, semester, department } = args;
+
+    // Check if a subject with the same name already exists (excluding the current subject)
+    const existingSubject = await ctx.db
+      .query("subjects")
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("name"), name),
+          q.eq(q.field("year"), year),
+          q.eq(q.field("semester"), semester),
+          q.eq(q.field("department"), department),
+          q.neq(q.field("_id"), id)
+        )
+      )
+      .first();
+
+    if (existingSubject) {
+      return {
+        success: false,
+        message:
+          "A subject with the same name already exists for this year, semester, and department",
+      };
+    }
+
+    // Update the subject
+    await ctx.db.patch(id, {
+      name,
+      year,
+      semester,
+      department,
+    });
+
+    return {
+      success: true,
+      message: "Subject updated successfully",
+    };
+  },
+});
+
 export const getAllSubjects = query({
   handler: async (ctx) => {
     return await ctx.db.query("subjects").collect();
