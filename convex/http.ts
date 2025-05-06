@@ -29,6 +29,9 @@ http.route({
             name: `${result.data.first_name ?? ""} ${
               result.data.last_name ?? ""
             }`,
+            lecName: result.data.username ?? "",
+            email: result.data.email_addresses[0].email_address,
+            role: result.data.public_metadata.role as string,
             image: result.data.image_url,
           });
           break;
@@ -38,6 +41,9 @@ http.route({
             name: `${result.data.first_name ?? ""} ${
               result.data.last_name ?? ""
             }`,
+            lecName: result.data.username ?? "",
+            email: result.data.email_addresses[0].email_address,
+            role: result.data.public_metadata.role as string,
             image: result.data.image_url,
           });
           break;
@@ -46,7 +52,7 @@ http.route({
       return new Response(null, {
         status: 200,
       });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       return new Response("Webhook Error", {
         status: 400,

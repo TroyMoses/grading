@@ -7,6 +7,8 @@ import { redirect } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Toaster } from "@/components/ui/toaster";
 import { Sidebar } from "@/components/sidebar";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
 export default function StudentDashboardLayout({
   children,
@@ -14,7 +16,16 @@ export default function StudentDashboardLayout({
   children: React.ReactNode;
 }) {
   const { user, isLoaded: userLoaded } = useUser();
-  if (!userLoaded) {
+
+  // Get the user from Convex database
+  const convexUser = useQuery(
+    api.users.getUserByClerkId,
+    user?.id ? { clerkId: user.id } : "skip"
+  );
+
+  const isUserLoading = !userLoaded || (user && convexUser === undefined);
+
+  if (isUserLoading) {
     return <p>Loading user data...</p>;
   }
 
@@ -22,7 +33,8 @@ export default function StudentDashboardLayout({
     redirect("/sign-in");
   }
 
-  const isStudent = user?.publicMetadata?.role === "student";
+  // Check if user is student from Convex database
+  const isStudent = convexUser?.role === "student";
 
   if (!isStudent) {
     redirect("/");

@@ -1,10 +1,14 @@
 "use client";
 
+import type React from "react";
+
 import { UserButton, useUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Toaster } from "@/components/ui/toaster";
 import { Sidebar } from "@/components/sidebar";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
 export default function AdminDashboardLayout({
   children,
@@ -12,7 +16,16 @@ export default function AdminDashboardLayout({
   children: React.ReactNode;
 }) {
   const { user, isLoaded: userLoaded } = useUser();
-  if (!userLoaded) {
+
+  // Get the user from Convex database
+  const convexUser = useQuery(
+    api.users.getUserByClerkId,
+    user?.id ? { clerkId: user.id } : "skip"
+  );
+
+  const isUserLoading = !userLoaded || (user && convexUser === undefined);
+
+  if (isUserLoading) {
     return <p>Loading user data...</p>;
   }
 
@@ -20,7 +33,8 @@ export default function AdminDashboardLayout({
     redirect("/sign-in");
   }
 
-  const isAdmin = user?.publicMetadata?.role === "admin";
+  // Check if user is admin from Convex database
+  const isAdmin = convexUser?.role === "admin";
 
   if (!isAdmin) {
     redirect("/lecturer-dashboard");
