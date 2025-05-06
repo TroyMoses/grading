@@ -12,13 +12,14 @@ import {
   X,
   MessageSquare,
   FileText,
+  UserCog,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 interface SidebarProps {
-  role: "admin" | "lecturer";
+  role: "admin" | "lecturer" | "student";
 }
 
 export function Sidebar({ role }: SidebarProps) {
@@ -30,6 +31,11 @@ export function Sidebar({ role }: SidebarProps) {
       href: "/admin-dashboard",
       label: "Dashboard",
       icon: LayoutDashboard,
+    },
+    {
+      href: "/admin-dashboard/users",
+      label: "User Management",
+      icon: UserCog,
     },
     {
       href: "/admin-dashboard/lecturers",
@@ -90,13 +96,33 @@ export function Sidebar({ role }: SidebarProps) {
       icon: BookOpen,
     },
     {
+      href: "/lecturer-dashboard/assignments",
+      label: "My Assignments",
+      icon: Award,
+    },
+    {
       href: "/student-feedback",
       label: "Student Feedback",
       icon: MessageSquare,
     },
   ];
 
-  const links = role === "admin" ? adminLinks : lecturerLinks;
+  const studentLinks = [
+    {
+      href: "/student-dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      href: "/student-feedback",
+      label: "Lecturer Evaluation",
+      icon: MessageSquare,
+    },
+  ];
+
+  let links = adminLinks;
+  if (role === "lecturer") links = lecturerLinks;
+  if (role === "student") links = studentLinks;
 
   return (
     <div
