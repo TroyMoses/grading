@@ -20,6 +20,14 @@ export const getLecturer = query({
   },
 });
 
+// Fetch a specific lecturer by ID
+export const getLecturerById = query({
+  args: { id: v.id("lecturers") },
+  handler: async (ctx, args): Promise<Lecturer | null> => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 // Create a new lecturer
 export const createLecturer = mutation({
   args: {
@@ -80,5 +88,16 @@ export const updateLecturerName = mutation({
       success: true,
       message: "Lecturer name updated successfully",
     };
+  },
+});
+
+export const getLecturerByClerkId = query({
+  args: { clerkId: v.string() },
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  handler: async (ctx, args) => {
+    // In a real implementation, we would look up the lecturer by the Clerk user ID
+    // For now, we'll return the first lecturer as a placeholder
+    const lecturers = await ctx.db.query("lecturers").collect();
+    return lecturers.length > 0 ? lecturers[0] : null;
   },
 });

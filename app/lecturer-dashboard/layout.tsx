@@ -1,9 +1,13 @@
 "use client";
 
+import type React from "react";
+
 import { UserButton, useUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sidebar } from "@/components/sidebar";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
 export default function LecturerDashboardLayout({
   children,
@@ -11,7 +15,16 @@ export default function LecturerDashboardLayout({
   children: React.ReactNode;
 }) {
   const { user, isLoaded: userLoaded } = useUser();
-  if (!userLoaded) {
+
+  // Get the user from Convex database
+  const convexUser = useQuery(
+    api.users.getUserByClerkId,
+    user?.id ? { clerkId: user.id } : "skip"
+  );
+
+  const isUserLoading = !userLoaded || (user && convexUser === undefined);
+
+  if (isUserLoading) {
     return <p>Loading user data...</p>;
   }
 
@@ -19,10 +32,34 @@ export default function LecturerDashboardLayout({
     redirect("/sign-in");
   }
 
-  const isLecturer = user?.publicMetadata?.role === "lecturer";
+  // Check if user is lecturer from Convex database and has a lecturerId
+  const isLecturer = convexUser?.role === "lecturer";
+  const hasLecturerId = Boolean(convexUser?.lecturerId);
 
   if (!isLecturer) {
     redirect("/");
+  }
+
+  // If the user is a lecturer but doesn't have an associated lecturerId
+  if (isLecturer && !hasLecturerId) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center max-w-md p-6 border rounded-lg shadow-md">
+          <h1 className="text-2xl font-bold mb-4">Account Not Fully Set Up</h1>
+          <p className="mb-4">
+            Your account has been created and assigned the lecturer role, but it
+            hasn{"'"}t been associated with a lecturer profile yet.
+          </p>
+          <p className="mb-4">
+            Please contact an administrator to complete your account setup by
+            associating your user account with your lecturer profile.
+          </p>
+          <div className="mt-6 flex justify-center">
+            <UserButton afterSignOutUrl="/" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

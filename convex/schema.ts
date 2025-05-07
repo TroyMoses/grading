@@ -5,16 +5,21 @@ export default defineSchema({
   users: defineTable({
     tokenIdentifier: v.string(),
     name: v.optional(v.string()),
+    lecName: v.optional(v.string()),
     image: v.optional(v.string()),
+    email: v.optional(v.string()),
+    role: v.optional(v.string()),
+    lecturerId: v.optional(v.id("lecturers")),
   }).index("by_tokenIdentifier", ["tokenIdentifier"]),
 
   lecturers: defineTable({
     name: v.string(),
     userId: v.string(),
+    hasUserAccount: v.optional(v.boolean()),
   }),
 
   lecturerDetails: defineTable({
-    lecturerId: v.id("lecturers"),
+    lecturerId: v.optional(v.id("lecturers")),
     subjectId: v.id("subjects"),
     semester: v.number(),
     qualification: v.string(),
@@ -32,7 +37,7 @@ export default defineSchema({
   }),
 
   feedbacks: defineTable({
-    lecturerId: v.id("lecturers"),
+    lecturerId: v.optional(v.id("lecturers")),
     subjectName: v.string(),
     value: v.string(),
   }),
@@ -50,7 +55,7 @@ export default defineSchema({
     yearOfStudy: v.string(),
 
     // Lecturer and subject
-    lecturerId: v.id("lecturers"),
+    lecturerId: v.optional(v.id("lecturers")),
     subjectId: v.id("subjects"),
 
     // Evaluation scores (10 questions, each out of 10)
