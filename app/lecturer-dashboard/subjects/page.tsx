@@ -2,7 +2,7 @@
 
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { useAuth } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -12,26 +12,44 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Lecturer, LecturerDetail, Subject } from "../../../lib/types";
 
 export default function LecturerSubjects() {
-  const { userId } = useAuth();
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //@ts-expect-error
-  const lecturer: Lecturer | null =
-    useQuery(api.lecturers.getLecturer, { userId: userId ?? "" }) || {};
-  const subjects: Subject[] =
-    useQuery(api.lecturerDetails.getSubjectsByLecturerId, {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-expect-error
-      lecturerId: lecturer._id,
-    }) || [];
-  const lecturerDetails: LecturerDetail[] =
-    useQuery(api.lecturerDetails.getLecturerDetailsByLecturerId, {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-expect-error
-      lecturerId: lecturer._id,
-    }) || [];
+  const { user } = useUser();
+  // Get the user from Convex database
+  const convexUser = useQuery(
+    api.users.getUserByClerkId,
+    user?.id ? { clerkId: user.id } : "skip"
+  );
+
+  // Only query for subjects if the user has a lecturerId
+  const subjects =
+    useQuery(
+      api.lecturerDetails.getSubjectsByLecturerId,
+      convexUser?.lecturerId ? { lecturerId: convexUser.lecturerId } : "skip"
+    ) || [];
+
+  // Similarly, only query for lecturer details if the user has a lecturerId
+  const lecturerDetails =
+    useQuery(
+      api.lecturerDetails.getLecturerDetailsByLecturerId,
+      convexUser?.lecturerId ? { lecturerId: convexUser.lecturerId } : "skip"
+    ) || [];
+
+  if (!convexUser?.lecturerId) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>My Subjects</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-6 text-muted-foreground">
+            Your account has not been associated with a lecturer profile yet.
+            Please contact an administrator.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

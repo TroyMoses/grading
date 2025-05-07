@@ -12,13 +12,14 @@ import {
   X,
   MessageSquare,
   FileText,
+  UserCog,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 interface SidebarProps {
-  role: "admin" | "lecturer";
+  role: "admin" | "lecturer" | "student";
 }
 
 export function Sidebar({ role }: SidebarProps) {
@@ -30,11 +31,18 @@ export function Sidebar({ role }: SidebarProps) {
       href: "/admin-dashboard",
       label: "Dashboard",
       icon: LayoutDashboard,
+      exact: true, // Only highlight when exact match
+    },
+    {
+      href: "/admin-dashboard/users",
+      label: "User Management",
+      icon: UserCog,
     },
     {
       href: "/admin-dashboard/lecturers",
       label: "Manage Lecturers",
       icon: Users,
+      exact: true, // Only highlight when exact match
     },
     {
       href: "/admin-dashboard/lecturers/manage",
@@ -60,6 +68,7 @@ export function Sidebar({ role }: SidebarProps) {
       href: "/admin-dashboard/subjects",
       label: "Grading Table",
       icon: GraduationCap,
+      exact: true, // Only highlight when exact match
     },
     {
       href: "/admin-dashboard/assignments",
@@ -83,11 +92,17 @@ export function Sidebar({ role }: SidebarProps) {
       href: "/lecturer-dashboard",
       label: "Dashboard",
       icon: LayoutDashboard,
+      exact: true, // Only highlight when exact match
     },
     {
       href: "/lecturer-dashboard/subjects",
       label: "My Subjects",
       icon: BookOpen,
+    },
+    {
+      href: "/lecturer-dashboard/assignments",
+      label: "My Assignments",
+      icon: Award,
     },
     {
       href: "/student-feedback",
@@ -96,7 +111,31 @@ export function Sidebar({ role }: SidebarProps) {
     },
   ];
 
-  const links = role === "admin" ? adminLinks : lecturerLinks;
+  const studentLinks = [
+    {
+      href: "/student-dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      exact: true, // Only highlight when exact match
+    },
+    {
+      href: "/student-feedback",
+      label: "Lecturer Evaluation",
+      icon: MessageSquare,
+    },
+  ];
+
+  let links = adminLinks;
+  if (role === "lecturer") links = lecturerLinks;
+  if (role === "student") links = studentLinks;
+
+  // Function to determine if a link is active
+  const isLinkActive = (href: string, exact = false) => {
+    if (exact) {
+      return pathname === href;
+    }
+    return pathname.startsWith(href);
+  };
 
   return (
     <div
@@ -129,7 +168,7 @@ export function Sidebar({ role }: SidebarProps) {
               href={link.href}
               className={cn(
                 "sidebar-link",
-                pathname === link.href && "active",
+                isLinkActive(link.href, link.exact) && "active",
                 collapsed && "justify-center px-2"
               )}
             >

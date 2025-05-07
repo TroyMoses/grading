@@ -10,7 +10,7 @@ import { Sidebar } from "@/components/sidebar";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
-export default function AdminDashboardLayout({
+export default function StudentDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -33,20 +33,20 @@ export default function AdminDashboardLayout({
     redirect("/sign-in");
   }
 
-  // Check if user is admin from Convex database
-  const isAdmin = convexUser?.role === "admin";
+  // Check if user is student from Convex database
+  const isStudent = convexUser?.role === "student";
 
-  if (!isAdmin) {
-    redirect("/lecturer-dashboard");
+  if (!isStudent) {
+    redirect("/");
   }
 
   return (
     <div className="flex h-screen bg-background">
-      <Sidebar role="admin" />
+      <Sidebar role="student" />
       <div className="flex-1 ml-[var(--sidebar-width)]">
         <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-6">
           <div className="flex-1">
-            <h1 className="text-xl font-semibold">Admin Dashboard</h1>
+            <h1 className="text-xl font-semibold">Student Dashboard</h1>
           </div>
           <UserButton afterSignOutUrl="/" />
         </header>
