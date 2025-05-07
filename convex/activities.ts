@@ -42,7 +42,7 @@ export const getRecentActivities = query({
         icon: "BookOpen",
       })),
       ...recentLecturerDetails.map((detail) => {
-        const lecturer = lecturerMap.get(detail.lecturerId);
+        const lecturer = detail.lecturerId ? lecturerMap.get(detail.lecturerId) : undefined;
         const subject = subjectMap.get(detail.subjectId);
         return {
           type: "lecturer_detail_updated",

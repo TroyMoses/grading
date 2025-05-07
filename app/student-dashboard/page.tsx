@@ -42,7 +42,7 @@ export default function StudentDashboard() {
             </p>
             <Button asChild>
               <Link
-                href="/student-feedback"
+                href="/student-dashboard/student-feedback"
                 className="flex items-center gap-2"
               >
                 <MessageSquare className="h-4 w-4" />

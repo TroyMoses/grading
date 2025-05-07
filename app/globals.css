@@ -99,7 +99,7 @@
 }
 
 .sidebar-link.active {
-  @apply bg-sidebar-active;
+  @apply bg-sidebar-active font-medium border-l-4 border-primary-foreground pl-2 shadow-[0_0_8px_rgba(255,255,255,0.2)];
 }
 
 .sidebar-link svg {

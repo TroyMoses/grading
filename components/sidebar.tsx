@@ -31,6 +31,7 @@ export function Sidebar({ role }: SidebarProps) {
       href: "/admin-dashboard",
       label: "Dashboard",
       icon: LayoutDashboard,
+      exact: true, // Only highlight when exact match
     },
     {
       href: "/admin-dashboard/users",
@@ -41,6 +42,7 @@ export function Sidebar({ role }: SidebarProps) {
       href: "/admin-dashboard/lecturers",
       label: "Manage Lecturers",
       icon: Users,
+      exact: true, // Only highlight when exact match
     },
     {
       href: "/admin-dashboard/lecturers/manage",
@@ -66,6 +68,7 @@ export function Sidebar({ role }: SidebarProps) {
       href: "/admin-dashboard/subjects",
       label: "Grading Table",
       icon: GraduationCap,
+      exact: true, // Only highlight when exact match
     },
     {
       href: "/admin-dashboard/assignments",
@@ -89,6 +92,7 @@ export function Sidebar({ role }: SidebarProps) {
       href: "/lecturer-dashboard",
       label: "Dashboard",
       icon: LayoutDashboard,
+      exact: true, // Only highlight when exact match
     },
     {
       href: "/lecturer-dashboard/subjects",
@@ -112,6 +116,7 @@ export function Sidebar({ role }: SidebarProps) {
       href: "/student-dashboard",
       label: "Dashboard",
       icon: LayoutDashboard,
+      exact: true, // Only highlight when exact match
     },
     {
       href: "/student-feedback",
@@ -123,6 +128,14 @@ export function Sidebar({ role }: SidebarProps) {
   let links = adminLinks;
   if (role === "lecturer") links = lecturerLinks;
   if (role === "student") links = studentLinks;
+
+  // Function to determine if a link is active
+  const isLinkActive = (href: string, exact = false) => {
+    if (exact) {
+      return pathname === href;
+    }
+    return pathname.startsWith(href);
+  };
 
   return (
     <div
@@ -155,7 +168,7 @@ export function Sidebar({ role }: SidebarProps) {
               href={link.href}
               className={cn(
                 "sidebar-link",
-                pathname === link.href && "active",
+                isLinkActive(link.href, link.exact) && "active",
                 collapsed && "justify-center px-2"
               )}
             >
