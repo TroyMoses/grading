@@ -53,9 +53,23 @@ export default function LecturerAssignments() {
         subjects: [],
         assignments: {},
         lecturerTotalWeights: {},
+        assignedCreditHours: {},
       }
     );
   }, [queryResult]);
+
+  // Get all subjects to access credit hours
+  const allSubjectsQuery = useQuery(api.subjects.getAllSubjects);
+  const allSubjects = useMemo(() => allSubjectsQuery || [], [allSubjectsQuery]);
+
+  // Create a map of subject names to credit hours
+  const subjectCreditHoursMap = useMemo(() => {
+    const map = new Map();
+    allSubjects.forEach((subject: { name: string; creditHours?: number }) => {
+      map.set(subject.name, subject.creditHours || 3);
+    });
+    return map;
+  }, [allSubjects]);
 
   // Get lecturer details for weight information
   const lecturerDetailsQuery = useQuery(
@@ -68,6 +82,7 @@ export default function LecturerAssignments() {
   // Filter assignments for this lecturer
   const lecturerName = lecturer?.name || "";
   const [assignedSubjects, setAssignedSubjects] = useState<string[]>([]);
+  const [totalCreditHours, setTotalCreditHours] = useState<number>(0);
 
   useEffect(() => {
     if (
@@ -82,10 +97,15 @@ export default function LecturerAssignments() {
           assignmentData.assignments[lecturerName][subject] === "Assigned"
       );
       setAssignedSubjects(filteredSubjects);
+      // Calculate total credit hours
+      const creditHours = filteredSubjects.reduce((total, subject) => {
+        return total + (subjectCreditHoursMap.get(subject) || 3);
+      }, 0);
+      setTotalCreditHours(creditHours);
     } else {
       setAssignedSubjects([]);
     }
-  }, [selectedSemester, lecturerName, assignmentData]);
+  }, [selectedSemester, lecturerName, assignmentData, subjectCreditHoursMap]);
 
   // Get weight for each subject
   const getSubjectWeight = (subjectName: string) => {
@@ -128,7 +148,8 @@ export default function LecturerAssignments() {
         <p className="opacity-90">
           View the subjects assigned to you based on the grading system.
           Assignments are determined by your qualifications, experience,
-          publications, feedback, and professional certifications.
+          publications, feedback, and professional certifications. You can be
+          assigned subjects up to a maximum of 15 credit hours.
         </p>
       </div>
 
@@ -155,28 +176,42 @@ export default function LecturerAssignments() {
         <CardContent>
           {selectedSemester ? (
             assignedSubjects.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Subject</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Your Weight</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {assignedSubjects.map((subject) => (
-                    <TableRow key={subject}>
-                      <TableCell className="font-medium">{subject}</TableCell>
-                      <TableCell>
-                        <Badge className="bg-primary">Assigned</Badge>
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Subject</TableHead>
+                      <TableHead>Credit Hours</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Your Weight</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {assignedSubjects.map((subject) => (
+                      <TableRow key={subject}>
+                        <TableCell className="font-medium">{subject}</TableCell>
+                        <TableCell>
+                          {subjectCreditHoursMap.get(subject) || 3}
+                        </TableCell>
+                        <TableCell>
+                          <Badge className="bg-primary">Assigned</Badge>
+                        </TableCell>
+                        <TableCell>
+                          {getSubjectWeight(subject).toFixed(2)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    <TableRow>
+                      <TableCell colSpan={1} className="font-bold">
+                        Total Credit Hours
                       </TableCell>
-                      <TableCell>
-                        {getSubjectWeight(subject).toFixed(2)}
+                      <TableCell colSpan={3} className="font-bold">
+                        {totalCreditHours} / 15
                       </TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableBody>
+                </Table>
+              </>
             ) : (
               <div className="text-center py-10 text-muted-foreground">
                 {lecturer

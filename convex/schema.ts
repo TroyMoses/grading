@@ -34,6 +34,7 @@ export default defineSchema({
     year: v.number(),
     semester: v.number(),
     department: v.string(),
+    creditHours: v.optional(v.number()),
   }),
 
   feedbacks: defineTable({
