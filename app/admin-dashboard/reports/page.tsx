@@ -36,10 +36,20 @@ export default function AssignmentReports() {
     subjects: [],
     assignments: {},
     lecturerTotalWeights: {},
+    assignedCreditHours: {},
   };
 
-  // Process the data to get lecturers with maximum assignments
-  const lecturersWithMaxAssignments = selectedSemester
+  // Get all subjects to access credit hours
+  const allSubjects = useQuery(api.subjects.getAllSubjects) || [];
+
+  // Create a map of subject names to credit hours
+  const subjectCreditHoursMap = new Map();
+  allSubjects.forEach((subject: { name: string; creditHours?: number }) => {
+    subjectCreditHoursMap.set(subject.name, subject.creditHours || 3);
+  });
+
+  // Process the data to get lecturers with assigned subjects
+  const lecturersWithAssignments = selectedSemester
     ? assignmentData.lecturers
         .map((lecturer: string) => {
           // Get all assigned subjects for this lecturer
@@ -50,25 +60,31 @@ export default function AssignmentReports() {
             .filter(([_, status]) => status === "Assigned")
             .map(([subject]) => subject);
 
-          // Only include lecturers with the maximum number of assignments (2)
-          return assignedSubjects.length === 2
-            ? {
-                name: lecturer,
-                subject1: assignedSubjects[0] || "-",
-                subject2: assignedSubjects[1] || "-",
-                totalWeight: assignmentData.lecturerTotalWeights[lecturer] || 0,
-              }
-            : null;
+          // Only include lecturers with at least one assignment
+          if (assignedSubjects.length === 0) return null;
+
+          // Calculate total credit hours
+          const totalCreditHours = assignedSubjects.reduce((total, subject) => {
+            return total + (subjectCreditHoursMap.get(subject) || 3);
+          }, 0);
+
+          return {
+            name: lecturer,
+            subjects: assignedSubjects,
+            totalCreditHours,
+            totalWeight: assignmentData.lecturerTotalWeights[lecturer] || 0,
+          };
         })
         .filter(Boolean)
     : [];
 
   // Filter lecturers based on search query
-  const filteredLecturers = lecturersWithMaxAssignments.filter(
+  const filteredLecturers = lecturersWithAssignments.filter(
     (lecturer) =>
       lecturer?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lecturer?.subject1.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lecturer?.subject2.toLowerCase().includes(searchQuery.toLowerCase())
+      lecturer?.subjects.some((subject) =>
+        subject.toLowerCase().includes(searchQuery.toLowerCase())
+      )
   );
 
   // Function to export data as CSV
@@ -76,7 +92,12 @@ export default function AssignmentReports() {
     if (filteredLecturers.length === 0) return;
 
     // Create CSV content
-    const headers = ["Lecturer", "Subject 1", "Subject 2", "Total Weight"];
+    const headers = [
+      "Lecturer",
+      "Assigned Subjects",
+      "Total Credit Hours",
+      "Total Weight",
+    ];
     const csvContent = [
       headers.join(","),
       ...filteredLecturers
@@ -86,7 +107,7 @@ export default function AssignmentReports() {
         )
         .map(
           (lecturer) =>
-            `"${lecturer.name}","${lecturer.subject1}","${lecturer.subject2}","${lecturer.totalWeight.toFixed(2)}"`
+            `"${lecturer.name}","${lecturer.subjects.join(", ")}","${lecturer.totalCreditHours}","${lecturer.totalWeight.toFixed(2)}"`
         ),
     ].join("\n");
 
@@ -109,9 +130,9 @@ export default function AssignmentReports() {
       <div className="gradient-card rounded-lg p-6 text-white">
         <h2 className="text-2xl font-bold mb-2">Lecturer Assignment Report</h2>
         <p className="opacity-90">
-          This report shows lecturers who have been assigned the maximum number
-          of subjects (2) based on the grading system. Select a semester to view
-          the assignments.
+          This report shows lecturers who have been assigned subjects based on
+          the grading system. Each lecturer can be assigned subjects up to a
+          maximum of 15 credit hours. Select a semester to view the assignments.
         </p>
       </div>
 
@@ -160,8 +181,8 @@ export default function AssignmentReports() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Lecturer</TableHead>
-                    <TableHead>Subject 1</TableHead>
-                    <TableHead>Subject 2</TableHead>
+                    <TableHead>Assigned Subjects</TableHead>
+                    <TableHead>Credit Hours</TableHead>
                     <TableHead>Total Weight</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -176,8 +197,17 @@ export default function AssignmentReports() {
                         <TableCell className="font-medium">
                           {lecturer.name}
                         </TableCell>
-                        <TableCell>{lecturer.subject1}</TableCell>
-                        <TableCell>{lecturer.subject2}</TableCell>
+                        <TableCell>
+                          <ul className="list-disc pl-5">
+                            {lecturer.subjects.map((subject) => (
+                              <li key={subject}>
+                                {subject} (
+                                {subjectCreditHoursMap.get(subject) || 3} cr)
+                              </li>
+                            ))}
+                          </ul>
+                        </TableCell>
+                        <TableCell>{lecturer.totalCreditHours} / 15</TableCell>
                         <TableCell>{lecturer.totalWeight.toFixed(2)}</TableCell>
                       </TableRow>
                     ))}
@@ -185,7 +215,7 @@ export default function AssignmentReports() {
               </Table>
             ) : (
               <div className="text-center py-10 text-muted-foreground">
-                No lecturers with maximum assignments found for this semester
+                No lecturers with assignments found for this semester
               </div>
             )
           ) : (

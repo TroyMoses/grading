@@ -36,6 +36,7 @@ export default function AssignmentTable() {
     subjects: [],
     assignments: {},
     lecturerTotalWeights: {},
+    assignedCreditHours: {},
   };
 
   // Get the grading data to show weights
@@ -43,6 +44,15 @@ export default function AssignmentTable() {
     api.lecturerDetails.getGradingData,
     selectedSemester ? { semester: selectedSemester as 1 | 2 } : {}
   ) || { lecturers: [], subjects: [], data: {} };
+
+  // Get all subjects to access credit hours
+  const allSubjects = useQuery(api.subjects.getAllSubjects) || [];
+
+  // Create a map of subject names to credit hours
+  const subjectCreditHoursMap = new Map();
+  allSubjects.forEach((subject: { name: string; creditHours?: number }) => {
+    subjectCreditHoursMap.set(subject.name, subject.creditHours || 3);
+  });
 
   // Filter lecturers based on search query
   const filteredLecturers = assignmentData.lecturers.filter(
@@ -58,7 +68,8 @@ export default function AssignmentTable() {
           View the automatic subject assignments based on lecturer grades.
           Lecturers are sorted by their total weight across all subjects. In
           case of a tie, the lecturer with the higher total weight gets
-          priority. Each subject is assigned to exactly one lecturer.
+          priority. Each lecturer can be assigned subjects up to a maximum of 15
+          credit hours.
         </p>
       </div>
 
@@ -101,8 +112,12 @@ export default function AssignmentTable() {
                           Lecturers (Sorted by Total Weight)
                         </TableHead>
                         {assignmentData.subjects.map((subject: string) => (
-                          <TableHead key={subject}>{subject}</TableHead>
+                          <TableHead key={subject}>
+                            {subject} ({subjectCreditHoursMap.get(subject) || 3}{" "}
+                            cr)
+                          </TableHead>
                         ))}
+                        <TableHead>Credit Hours</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -167,6 +182,19 @@ export default function AssignmentTable() {
                               </TableCell>
                             );
                           })}
+                          <TableCell>
+                            <Badge
+                              variant={
+                                assignmentData.assignedCreditHours[lecturer] > 0
+                                  ? "default"
+                                  : "outline"
+                              }
+                            >
+                              {assignmentData.assignedCreditHours[lecturer] ||
+                                0}{" "}
+                              / 15
+                            </Badge>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
