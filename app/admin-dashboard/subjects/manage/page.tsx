@@ -38,7 +38,9 @@ export default function ManageSubjects() {
   const [year, setYear] = useState<number>(1);
   const [semester, setSemester] = useState<number>(1);
   const [department, setDepartment] = useState("");
-  const [subjects, setSubjects] = useState<string[]>([""]);
+  const [subjects, setSubjects] = useState<
+    Array<{ name: string; creditHours: number }>
+  >([{ name: "", creditHours: 3 }]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
@@ -55,14 +57,22 @@ export default function ManageSubjects() {
     );
   });
 
-  const handleSubjectChange = (index: number, value: string) => {
+  const handleSubjectChange = (
+    index: number,
+    field: "name" | "creditHours",
+    value: string | number
+  ) => {
     const newSubjects = [...subjects];
-    newSubjects[index] = value;
+    if (field === "name") {
+      newSubjects[index].name = value as string;
+    } else {
+      newSubjects[index].creditHours = Number(value);
+    }
     setSubjects(newSubjects);
   };
 
   const addSubjectField = () => {
-    setSubjects([...subjects, ""]);
+    setSubjects([...subjects, { name: "", creditHours: 3 }]);
   };
 
   const removeSubjectField = (index: number) => {
@@ -73,11 +83,14 @@ export default function ManageSubjects() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Filter out subjects with empty names
+      const validSubjects = subjects.filter((s) => s.name.trim() !== "");
+
       const result = await createSubjects({
         year,
         semester,
         department,
-        subjects: subjects.filter((s) => s.trim() !== ""),
+        subjects: validSubjects,
       });
       // Handle the response
       if (result.createdSubjects && result.createdSubjects.length > 0) {
@@ -96,7 +109,7 @@ export default function ManageSubjects() {
       // Reset form
       setYear(1);
       setSemester(1);
-      setSubjects([""]);
+      setSubjects([{ name: "", creditHours: 3 }]);
       setDepartment("");
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -115,22 +128,29 @@ export default function ManageSubjects() {
     year: number;
     semester: number;
     department: string;
+    creditHours?: number;
   }
 
   const handleEditClick = (subject: Subject) => {
-    setSelectedSubject(subject);
+    setSelectedSubject({
+      ...subject,
+      creditHours: subject.creditHours || 3, // Default to 3 if not set
+    });
     setIsEditDialogOpen(true);
   };
 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedSubject) return;
+
     try {
       await updateSubject({
-        id: selectedSubject?._id as Id<"subjects">,
-        name: selectedSubject?.name as string,
-        year: selectedSubject?.year as number,
-        semester: selectedSubject?.semester as number,
-        department: selectedSubject?.department as string,
+        id: selectedSubject._id as Id<"subjects">,
+        name: selectedSubject.name as string,
+        year: selectedSubject.year as number,
+        semester: selectedSubject.semester as number,
+        department: selectedSubject.department as string,
+        creditHours: selectedSubject.creditHours || 3,
       });
 
       toast({
@@ -200,23 +220,42 @@ export default function ManageSubjects() {
               </div>
             </div>
             {subjects.map((subject, index) => (
-              <div key={index} className="flex items-center space-x-2">
-                <Input
-                  type="text"
-                  value={subject}
-                  onChange={(e) => handleSubjectChange(index, e.target.value)}
-                  placeholder={`Subject ${index + 1}`}
-                  required
-                />
-                {index > 0 && (
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={() => removeSubjectField(index)}
-                  >
-                    Remove
-                  </Button>
-                )}
+              <div key={index} className="grid grid-cols-12 gap-2 items-center">
+                <div className="col-span-8">
+                  <Input
+                    type="text"
+                    value={subject.name}
+                    onChange={(e) =>
+                      handleSubjectChange(index, "name", e.target.value)
+                    }
+                    placeholder={`Subject ${index + 1}`}
+                    required
+                  />
+                </div>
+                <div className="col-span-2">
+                  <Input
+                    type="number"
+                    value={subject.creditHours}
+                    onChange={(e) =>
+                      handleSubjectChange(index, "creditHours", e.target.value)
+                    }
+                    placeholder="Credit Hours"
+                    min={1}
+                    max={6}
+                    required
+                  />
+                </div>
+                <div className="col-span-2">
+                  {index > 0 && (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      onClick={() => removeSubjectField(index)}
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </div>
               </div>
             ))}
             <div className="flex gap-5">
@@ -245,6 +284,7 @@ export default function ManageSubjects() {
             <TableHeader>
               <TableRow>
                 <TableHead>Subject Name</TableHead>
+                <TableHead>Credit Hours</TableHead>
                 <TableHead>Year</TableHead>
                 <TableHead>Semester</TableHead>
                 <TableHead>Department</TableHead>
@@ -255,6 +295,7 @@ export default function ManageSubjects() {
               {filteredSubjects.map((subject: Subject) => (
                 <TableRow key={subject._id}>
                   <TableCell>{subject.name}</TableCell>
+                  <TableCell>{subject.creditHours || 3}</TableCell>
                   <TableCell>{subject.year}</TableCell>
                   <TableCell>{subject.semester}</TableCell>
                   <TableCell>{subject.department}</TableCell>
@@ -292,6 +333,23 @@ export default function ManageSubjects() {
                       name: e.target.value,
                     })
                   }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-credit-hours">Credit Hours</Label>
+                <Input
+                  id="edit-credit-hours"
+                  type="number"
+                  value={selectedSubject.creditHours}
+                  onChange={(e) =>
+                    setSelectedSubject({
+                      ...selectedSubject,
+                      creditHours: Number(e.target.value),
+                    })
+                  }
+                  min={1}
+                  max={6}
                   required
                 />
               </div>

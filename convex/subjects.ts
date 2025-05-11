@@ -6,7 +6,12 @@ export const createSubjects = mutation({
     year: v.number(),
     semester: v.number(),
     department: v.string(),
-    subjects: v.array(v.string()),
+    subjects: v.array(
+      v.object({
+        name: v.string(),
+        creditHours: v.number(),
+      })
+    ),
   },
   handler: async (ctx, args) => {
     const { year, semester, department, subjects } = args;
@@ -29,7 +34,7 @@ export const createSubjects = mutation({
 
     // Filter out subjects that already exist
     const newSubjects = subjects.filter(
-      (subjectName) => !existingSubjectNames.has(subjectName)
+      (subject) => !existingSubjectNames.has(subject.name)
     );
 
     // Return early if all subjects already exist
@@ -38,9 +43,11 @@ export const createSubjects = mutation({
         message: "All subjects already exist",
         createdSubjects: [],
         existingSubjects: subjects
-          .map((name) => {
-            const subject = existingSubjects.find((s) => s.name === name);
-            return subject ? subject._id : null;
+          .map((subject) => {
+            const existingSubject = existingSubjects.find(
+              (s) => s.name === subject.name
+            );
+            return existingSubject ? existingSubject._id : null;
           })
           .filter(Boolean),
       };
@@ -48,9 +55,10 @@ export const createSubjects = mutation({
 
     // Insert only new subjects
     const createdSubjects = await Promise.all(
-      newSubjects.map(async (subjectName) => {
+      newSubjects.map(async (subject) => {
         return await ctx.db.insert("subjects", {
-          name: subjectName,
+          name: subject.name,
+          creditHours: subject.creditHours,
           year,
           semester,
           department,
@@ -64,10 +72,12 @@ export const createSubjects = mutation({
           : "All subjects added successfully",
       createdSubjects,
       existingSubjects: subjects
-        .filter((name) => existingSubjectNames.has(name))
-        .map((name) => {
-          const subject = existingSubjects.find((s) => s.name === name);
-          return subject ? subject._id : null;
+        .filter((subject) => existingSubjectNames.has(subject.name))
+        .map((subject) => {
+          const existingSubject = existingSubjects.find(
+            (s) => s.name === subject.name
+          );
+          return existingSubject ? existingSubject._id : null;
         })
         .filter(Boolean),
     };
@@ -81,9 +91,10 @@ export const updateSubject = mutation({
     year: v.number(),
     semester: v.number(),
     department: v.string(),
+    creditHours: v.number(),
   },
   handler: async (ctx, args) => {
-    const { id, name, year, semester, department } = args;
+    const { id, name, year, semester, department, creditHours } = args;
 
     // Check if a subject with the same name already exists (excluding the current subject)
     const existingSubject = await ctx.db
@@ -113,6 +124,7 @@ export const updateSubject = mutation({
       year,
       semester,
       department,
+      creditHours,
     });
 
     return {
