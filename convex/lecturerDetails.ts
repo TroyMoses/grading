@@ -276,7 +276,7 @@ export const getAssignmentData = query({
     });
 
     // Maximum credit hours per lecturer (can be 14 or 15)
-    const MAX_CREDIT_HOURS = 15;
+    const MAX_CREDIT_HOURS = 22;
 
     // Track assigned credit hours for each lecturer
     const assignedCreditHours: { [key: string]: number } = {};
