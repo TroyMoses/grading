@@ -68,7 +68,7 @@ export default function AssignmentTable() {
           View the automatic subject assignments based on lecturer grades.
           Lecturers are sorted by their total weight across all subjects. In
           case of a tie, the lecturer with the higher total weight gets
-          priority. Each lecturer can be assigned subjects up to a maximum of 15
+          priority. Each lecturer can be assigned subjects up to a maximum of 18-21
           credit hours.
         </p>
       </div>
