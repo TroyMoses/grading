@@ -131,8 +131,7 @@ export default function AssignmentReports() {
         <h2 className="text-2xl font-bold mb-2">Lecturer Assignment Report</h2>
         <p className="opacity-90">
           This report shows lecturers who have been assigned subjects based on
-          the grading system. Each lecturer can be assigned subjects up to a
-          maximum of 18-21 credit hours. Select a semester to view the assignments.
+          the grading system. Each lecturer can be assigned subjects between 18-21 credit hours. Select a semester to view the assignments.
         </p>
       </div>
 
