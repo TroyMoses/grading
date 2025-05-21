@@ -81,7 +81,7 @@ export function Sidebar({ role }: SidebarProps) {
       icon: FileText,
     },
     {
-      href: "/student-feedback",
+      href: "/student-dashboard/student-feedback",
       label: "Student Feedback",
       icon: MessageSquare,
     },
@@ -119,7 +119,7 @@ export function Sidebar({ role }: SidebarProps) {
       exact: true, // Only highlight when exact match
     },
     {
-      href: "/student-feedback",
+      href: "/student-dashboard/student-feedback",
       label: "Lecturer Evaluation",
       icon: MessageSquare,
     },
