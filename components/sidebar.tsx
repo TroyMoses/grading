@@ -104,11 +104,6 @@ export function Sidebar({ role }: SidebarProps) {
       label: "My Assignments",
       icon: Award,
     },
-    {
-      href: "/student-feedback",
-      label: "Student Feedback",
-      icon: MessageSquare,
-    },
   ];
 
   const studentLinks = [
