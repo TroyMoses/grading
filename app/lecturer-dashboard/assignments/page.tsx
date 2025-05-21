@@ -149,7 +149,7 @@ export default function LecturerAssignments() {
           View the subjects assigned to you based on the grading system.
           Assignments are determined by your qualifications, experience,
           publications, feedback, and professional certifications. You can be
-          assigned subjects up to a maximum of 15 credit hours.
+          assigned subjects up to a maximum of 18-21 credit hours.
         </p>
       </div>
 
@@ -206,7 +206,7 @@ export default function LecturerAssignments() {
                         Total Credit Hours
                       </TableCell>
                       <TableCell colSpan={3} className="font-bold">
-                        {totalCreditHours} / 15
+                        {totalCreditHours} / 21
                       </TableCell>
                     </TableRow>
                   </TableBody>
