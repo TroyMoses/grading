@@ -192,7 +192,7 @@ export default function AssignmentTable() {
                             >
                               {assignmentData.assignedCreditHours[lecturer] ||
                                 0}{" "}
-                              / 15
+                              / 21
                             </Badge>
                           </TableCell>
                         </TableRow>
