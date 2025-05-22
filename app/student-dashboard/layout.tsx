@@ -35,8 +35,9 @@ export default function StudentDashboardLayout({
 
   // Check if user is student from Convex database
   const isStudent = convexUser?.role === "student";
+  const isAdmin = convexUser?.role === "admin";
 
-  if (!isStudent) {
+  if (!isStudent && !isAdmin) {
     redirect("/");
   }
 
