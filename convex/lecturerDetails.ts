@@ -278,81 +278,55 @@ export const getAssignmentData = query({
     // Maximum credit hours per lecturer (can be 18 - 21)
     const MAX_CREDIT_HOURS = 21;
 
+    // New assignment logic based on credit hours
+    // First, create a priority queue of lecturer-subject pairs based on weights
+    const assignmentPairs: {
+      lecturer: string;
+      subject: string;
+      weight: number;
+    }[] = [];
+
+    // Build the assignment pairs list
+    for (const lecturer of lecturerNames) {
+      for (const subject of sortedSubjects) {
+        const weight = data[lecturer]?.[subject] || 0;
+        if (weight > 0) {
+          assignmentPairs.push({ lecturer, subject, weight });
+        }
+      }
+    }
+
+    // Sort the pairs by weight (highest first)
+    assignmentPairs.sort((a, b) => b.weight - a.weight);
+
+    const assignedSubjects = new Set<string>();
+
     // Track assigned credit hours for each lecturer
     const assignedCreditHours: { [key: string]: number } = {};
     lecturerNames.forEach((lecturer) => {
       assignedCreditHours[lecturer] = 0;
     });
 
-    // Keep track of which subjects have been assigned
-    const assignedSubjects = new Set<string>();
+    // Process the pairs in order of weight
+    for (const { lecturer, subject } of assignmentPairs) {
+      // Skip if subject is already assigned
+      if (assignedSubjects.has(subject)) continue;
 
-    // New assignment logic based on credit hours
-    // Process each lecturer in order of total weight
-    for (const lecturer of sortedLecturers) {
-      // Get all subjects with weights for this lecturer
-      const lecturerSubjects = Object.entries(data[lecturer] || {})
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        .filter(([_, weight]) => weight > 0) // Only consider subjects with positive weights
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        .sort(([, weightA], [, weightB]) => weightB - weightA); // Sort by weight descending
+      // Get credit hours for this subject
+      const subjectCredits = subjectCreditHours[subject] || 3;
 
-      // Try to assign subjects to this lecturer, starting with their highest weighted subject
-      for (const [subject, weight] of lecturerSubjects) {
-        // Skip if subject is already assigned to someone else
-        if (assignedSubjects.has(subject)) continue;
+      // Skip if adding this subject would exceed the maximum credit hours
+      if (assignedCreditHours[lecturer] + subjectCredits > MAX_CREDIT_HOURS)
+        continue;
 
-        // Get credit hours for this subject
-        const subjectCredits = subjectCreditHours[subject] || 3;
-
-        // Skip if adding this subject would exceed the maximum credit hours
-        if (assignedCreditHours[lecturer] + subjectCredits > MAX_CREDIT_HOURS)
-          continue;
-
-        // Check if this lecturer has the highest weight for this subject
-        let hasHighestWeight = true;
-        let isTied = false;
-        const tiedLecturers: string[] = [];
-
-        for (const otherLecturer of lecturerNames) {
-          if (otherLecturer === lecturer) continue; // Skip comparing with self
-
-          const otherWeight = data[otherLecturer]?.[subject] || 0;
-
-          if (otherWeight > weight) {
-            hasHighestWeight = false;
-            break;
-          } else if (otherWeight === weight && weight > 0) {
-            isTied = true;
-            tiedLecturers.push(otherLecturer);
-          }
-        }
-
-        // If there's a tie, the lecturer with the higher total weight gets priority
-        if (hasHighestWeight) {
-          // If there's a tie, check if any of the tied lecturers comes before this one
-          // in the sorted list (meaning they have higher total weight)
-          if (isTied) {
-            const higherRankedTiedLecturers = tiedLecturers.filter(
-              (tiedLecturer) =>
-                sortedLecturers.indexOf(tiedLecturer) <
-                sortedLecturers.indexOf(lecturer)
-            );
-
-            // If there are tied lecturers with higher total weight, skip this subject
-            if (higherRankedTiedLecturers.length > 0) continue;
-          }
-
-          // Assign the subject to this lecturer
-          assignments[lecturer][subject] = "Assigned";
-          assignedCreditHours[lecturer] += subjectCredits;
-          assignedSubjects.add(subject);
-        }
-      }
+      // Assign the subject to this lecturer
+      assignments[lecturer][subject] = "Assigned";
+      assignedCreditHours[lecturer] += subjectCredits;
+      assignedSubjects.add(subject);
     }
 
-    // Second pass: For any unassigned subjects, assign to the lecturer with the highest weight
-    // who hasn't reached their maximum credit hours
+    // If there are still unassigned subjects, try to assign them to lecturers
+    // who haven't reached their maximum credit hours
     for (const subject of sortedSubjects) {
       // Skip if the subject is already assigned
       if (assignedSubjects.has(subject)) continue;
@@ -364,8 +338,8 @@ export const getAssignmentData = query({
       let bestLecturer = null;
       let bestWeight = -1;
 
-      // Check lecturers in order of total weight
-      for (const lecturer of sortedLecturers) {
+      // Check all lecturers
+      for (const lecturer of lecturerNames) {
         // Skip if adding this subject would exceed the maximum credit hours
         if (assignedCreditHours[lecturer] + subjectCredits > MAX_CREDIT_HOURS)
           continue;
@@ -378,7 +352,7 @@ export const getAssignmentData = query({
       }
 
       // Assign the subject if we found an eligible lecturer
-      if (bestLecturer && bestWeight > 0) {
+      if (bestLecturer) {
         assignments[bestLecturer][subject] = "Assigned";
         assignedCreditHours[bestLecturer] += subjectCredits;
         assignedSubjects.add(subject);

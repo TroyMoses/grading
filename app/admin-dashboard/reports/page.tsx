@@ -206,7 +206,7 @@ export default function AssignmentReports() {
                             ))}
                           </ul>
                         </TableCell>
-                        <TableCell>{lecturer.totalCreditHours} / 15</TableCell>
+                        <TableCell>{lecturer.totalCreditHours} / 21</TableCell>
                         <TableCell>{lecturer.totalWeight.toFixed(2)}</TableCell>
                       </TableRow>
                     ))}
