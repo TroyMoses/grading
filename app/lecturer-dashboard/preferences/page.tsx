@@ -217,33 +217,6 @@ export default function LecturerPreferences() {
         </p>
       </div>
 
-      {/* Debug Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Debug Information</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 text-sm">
-            <p>
-              <strong>User ID:</strong> {user?.id}
-            </p>
-            <p>
-              <strong>Convex User:</strong> {convexUser ? "Found" : "Not found"}
-            </p>
-            <p>
-              <strong>Lecturer ID:</strong> {lecturer?._id}
-            </p>
-            <p>
-              <strong>Lecturer Name:</strong> {lecturer?.name}
-            </p>
-            <p>
-              <strong>Total Preferences in DB:</strong>{" "}
-              {allPreferences?.length || 0}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Set Subject Preferences</CardTitle>
