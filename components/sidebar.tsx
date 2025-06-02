@@ -13,6 +13,7 @@ import {
   MessageSquare,
   FileText,
   UserCog,
+  Heart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -103,6 +104,11 @@ export function Sidebar({ role }: SidebarProps) {
       href: "/lecturer-dashboard/assignments",
       label: "My Assignments",
       icon: Award,
+    },
+    {
+      href: "/lecturer-dashboard/preferences",
+      label: "Subject Preferences",
+      icon: Heart,
     },
   ];
 

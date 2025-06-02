@@ -68,8 +68,8 @@ export default function AssignmentTable() {
           View the automatic subject assignments based on lecturer grades.
           Lecturers are sorted by their total weight across all subjects. In
           case of a tie, the lecturer with the higher total weight gets
-          priority. Each lecturer can be assigned subjects between 18-21
-          credit hours.
+          priority. Each lecturer can be assigned subjects between 18-21 credit
+          hours.
         </p>
       </div>
 
@@ -178,6 +178,20 @@ export default function AssignmentTable() {
                                   >
                                     Weight: {weight.toFixed(2)}
                                   </span>
+                                  {assignmentData.preferences &&
+                                    assignmentData.preferences[lecturer] &&
+                                    assignmentData.preferences[lecturer][
+                                      subject
+                                    ] && (
+                                      <span className="text-xs text-blue-600 font-medium">
+                                        Preference:{" "}
+                                        {
+                                          assignmentData.preferences[lecturer][
+                                            subject
+                                          ]
+                                        }
+                                      </span>
+                                    )}
                                 </div>
                               </TableCell>
                             );

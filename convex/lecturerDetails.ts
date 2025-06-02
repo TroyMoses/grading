@@ -228,9 +228,36 @@ export const getAssignmentData = query({
     // Map to store credit hours for each subject
     const subjectCreditHours: { [key: string]: number } = {};
 
+    // Map to store preferences for each lecturer-subject pair
+    const preferences: { [key: string]: { [key: string]: number | null } } = {};
+
+    // Fetch lecturer preferences for the semester
+    let lecturerPreferences = await ctx.db
+      .query("lecturerPreferences")
+      .collect();
+    if (args.semester !== undefined) {
+      lecturerPreferences = lecturerPreferences.filter(
+        (pref) => pref.semester === args.semester
+      );
+    }
+
     // Fill the subject credit hours map
     subjects.forEach((subject) => {
       subjectCreditHours[subject.name] = subject.creditHours || 3; // Default to 3 if not set
+    });
+
+    // Initialize preferences map
+    lecturers.forEach((lecturer) => {
+      preferences[lecturer.name] = {};
+    });
+
+    // Fill preferences map
+    lecturerPreferences.forEach((pref) => {
+      const lecturer = lecturers.find((l) => l._id === pref.lecturerId);
+      const subject = subjects.find((s) => s._id === pref.subjectId);
+      if (lecturer && subject) {
+        preferences[lecturer.name][subject.name] = pref.preference;
+      }
     });
 
     // Calculate weights for each lecturer-subject pair
@@ -244,6 +271,11 @@ export const getAssignmentData = query({
         const totalWeight = calculateTotalWeight(detail);
         data[lecturer.name][subject.name] = totalWeight;
         semesterSubjects.add(subject.name);
+
+        // Initialize preference if not set
+        if (!preferences[lecturer.name][subject.name]) {
+          preferences[lecturer.name][subject.name] = null;
+        }
       }
     });
 
