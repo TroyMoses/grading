@@ -18,6 +18,7 @@ import type * as clerk from "../clerk.js";
 import type * as feedbacks from "../feedbacks.js";
 import type * as http from "../http.js";
 import type * as lecturerDetails from "../lecturerDetails.js";
+import type * as lecturerPreferences from "../lecturerPreferences.js";
 import type * as lecturers from "../lecturers.js";
 import type * as studentFeedback from "../studentFeedback.js";
 import type * as subjects from "../subjects.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   feedbacks: typeof feedbacks;
   http: typeof http;
   lecturerDetails: typeof lecturerDetails;
+  lecturerPreferences: typeof lecturerPreferences;
   lecturers: typeof lecturers;
   studentFeedback: typeof studentFeedback;
   subjects: typeof subjects;

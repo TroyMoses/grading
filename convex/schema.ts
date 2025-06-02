@@ -77,4 +77,15 @@ export default defineSchema({
     // Submission timestamp
     createdAt: v.number(),
   }).index("by_lecturer_subject", ["lecturerId", "subjectId"]),
+
+  // New table for lecturer preferences
+  lecturerPreferences: defineTable({
+    lecturerId: v.id("lecturers"),
+    subjectId: v.id("subjects"),
+    preference: v.number(), // 1 = highest preference, 2 = second, etc.
+    semester: v.number(),
+  })
+    .index("by_lecturer", ["lecturerId"])
+    .index("by_subject", ["subjectId"])
+    .index("by_lecturer_subject", ["lecturerId", "subjectId"]),
 });

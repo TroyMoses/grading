@@ -48,11 +48,72 @@ export default function AssignmentTable() {
   // Get all subjects to access credit hours
   const allSubjects = useQuery(api.subjects.getAllSubjects) || [];
 
+  // Get all lecturers for ID mapping
+  const allLecturers = useQuery(api.lecturers.getAllLecturers) || [];
+
+  // Get all preferences to show alongside assignments
+  const allPreferences =
+    useQuery(api.lecturerPreferences.debugGetAllPreferences) || [];
+
   // Create a map of subject names to credit hours
   const subjectCreditHoursMap = new Map();
   allSubjects.forEach((subject: { name: string; creditHours?: number }) => {
     subjectCreditHoursMap.set(subject.name, subject.creditHours || 3);
   });
+
+  // Create maps for efficient lookups
+  const lecturerNameToIdMap = new Map();
+  const subjectNameToIdMap = new Map();
+
+  allLecturers.forEach((lecturer: { _id: string; name: string }) => {
+    lecturerNameToIdMap.set(lecturer.name, lecturer._id);
+  });
+
+  allSubjects.forEach((subject: { _id: string; name: string }) => {
+    subjectNameToIdMap.set(subject.name, subject._id);
+  });
+
+  // Function to get preference for a lecturer-subject pair
+  const getPreference = (lecturerName: string, subjectName: string) => {
+    const lecturerId = lecturerNameToIdMap.get(lecturerName);
+    const subjectId = subjectNameToIdMap.get(subjectName);
+
+    if (!lecturerId || !subjectId) return null;
+
+    type Preference = {
+      lecturerId: string;
+      subjectId: string;
+      semester: number;
+      preference: number;
+    };
+
+    const preference = allPreferences.find(
+      (pref: Preference) =>
+        pref.lecturerId === lecturerId &&
+        pref.subjectId === subjectId &&
+        pref.semester === selectedSemester
+    );
+
+    return preference?.preference || null;
+  };
+
+  // Function to get preference badge variant
+  const getPreferenceBadgeVariant = (preference: number) => {
+    switch (preference) {
+      case 1:
+        return "default"; // Blue
+      case 2:
+        return "secondary"; // Gray
+      case 3:
+        return "outline"; // White with border
+      case 4:
+        return "destructive"; // Red
+      case 5:
+        return "outline"; // White with border
+      default:
+        return "outline";
+    }
+  };
 
   // Filter lecturers based on search query
   const filteredLecturers = assignmentData.lecturers.filter(
@@ -68,8 +129,8 @@ export default function AssignmentTable() {
           View the automatic subject assignments based on lecturer grades.
           Lecturers are sorted by their total weight across all subjects. In
           case of a tie, the lecturer with the higher total weight gets
-          priority. Each lecturer can be assigned subjects between 18-21
-          credit hours.
+          priority. Each lecturer can be assigned subjects between 18-21 credit
+          hours. Preferences are shown for assigned subjects.
         </p>
       </div>
 
@@ -161,15 +222,21 @@ export default function AssignmentTable() {
                                   }, 0)
                               : 0;
                             // Return
+
+                            // Get preference only for assigned subjects
+                            const preference = isAssigned
+                              ? getPreference(lecturer, subject)
+                              : null;
+
                             return (
                               <TableCell key={`${lecturer}-${subject}`}>
-                                <div className="flex flex-col">
+                                <div className="flex flex-col gap-1">
                                   {isAssigned ? (
-                                    <Badge className="bg-primary self-start mb-1">
+                                    <Badge className="bg-primary self-start">
                                       Assigned
                                     </Badge>
                                   ) : (
-                                    <span className="text-muted-foreground text-xs mb-1">
+                                    <span className="text-muted-foreground text-xs">
                                       Not Assigned
                                     </span>
                                   )}
@@ -178,6 +245,17 @@ export default function AssignmentTable() {
                                   >
                                     Weight: {weight.toFixed(2)}
                                   </span>
+                                  {/* Show preference only for assigned subjects */}
+                                  {isAssigned && preference && (
+                                    <Badge
+                                      variant={getPreferenceBadgeVariant(
+                                        preference
+                                      )}
+                                      className="self-start text-xs"
+                                    >
+                                      Preference: {preference}
+                                    </Badge>
+                                  )}
                                 </div>
                               </TableCell>
                             );
@@ -206,6 +284,27 @@ export default function AssignmentTable() {
           ) : (
             <div className="text-center py-10 text-muted-foreground">
               Please select a semester to view the assignment table
+            </div>
+          )}
+
+          {/* Debug Information */}
+          {selectedSemester && (
+            <div className="mt-6 p-4 bg-muted rounded-lg">
+              <h3 className="font-semibold mb-2">Debug Information</h3>
+              <div className="text-sm text-muted-foreground space-y-1">
+                <p>Total Preferences in DB: {allPreferences.length}</p>
+                <p>Selected Semester: {selectedSemester}</p>
+                <p>Filtered Lecturers: {filteredLecturers.length}</p>
+                <p>
+                  Preferences for this semester:{" "}
+                  {
+                    allPreferences.filter(
+                      (p: { semester: number }) =>
+                        p.semester === selectedSemester
+                    ).length
+                  }
+                </p>
+              </div>
             </div>
           )}
         </CardContent>
