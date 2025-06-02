@@ -310,17 +310,6 @@ export default function AssignmentReports() {
         </CardContent>
       </Card>
 
-      {/* Debug information */}
-      <Card className="bg-slate-50">
-        <CardHeader>
-          <CardTitle>Debug Information</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>Total preferences in database: {allPreferences.length}</p>
-          <p>Selected semester: {selectedSemester}</p>
-          <p>Lecturers with assignments: {lecturersWithAssignments.length}</p>
-        </CardContent>
-      </Card>
     </div>
   );
 }

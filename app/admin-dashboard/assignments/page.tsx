@@ -287,26 +287,6 @@ export default function AssignmentTable() {
             </div>
           )}
 
-          {/* Debug Information */}
-          {selectedSemester && (
-            <div className="mt-6 p-4 bg-muted rounded-lg">
-              <h3 className="font-semibold mb-2">Debug Information</h3>
-              <div className="text-sm text-muted-foreground space-y-1">
-                <p>Total Preferences in DB: {allPreferences.length}</p>
-                <p>Selected Semester: {selectedSemester}</p>
-                <p>Filtered Lecturers: {filteredLecturers.length}</p>
-                <p>
-                  Preferences for this semester:{" "}
-                  {
-                    allPreferences.filter(
-                      (p: { semester: number }) =>
-                        p.semester === selectedSemester
-                    ).length
-                  }
-                </p>
-              </div>
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>
